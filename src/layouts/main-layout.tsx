@@ -7,6 +7,7 @@ import {
   AppstoreAddOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;
 
@@ -30,7 +31,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             Home
           </Menu.Item>
           <Menu.Item key="2" icon={<AppstoreAddOutlined />}>
-            Add Item
+            <Link to="/quiz">Quiz</Link>
           </Menu.Item>
           <Menu.Item key="3" icon={<UserOutlined />}>
             Profile
