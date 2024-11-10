@@ -1,30 +1,48 @@
 import { Quiz } from '../entities/quiz';
 
-class QuizRepository {
-  private quizzes: Quiz[] = [];
+export class QuizRepository {
+  private quizzes: Quiz[] = JSON.parse(localStorage.getItem('quizzes') || '[]');
 
   add(quiz: Quiz) {
-    this.quizzes.push(quiz);
+    const newQuiz = {
+      ...quiz,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.quizzes.push(newQuiz);
+    this.updateLocalStorage();
   }
 
   getAll(): Quiz[] {
-    return this.quizzes;
+    return this.quizzes.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : -Infinity; // Treat null as very old date
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : -Infinity; // Treat null as very old date
+
+      return dateB - dateA; // Newest first
+    });
   }
 
-  getById(id: number): Quiz | undefined {
+  getById(id: string): Quiz | undefined {
     return this.quizzes.find((quiz) => quiz.id === id);
   }
 
-  delete(id: number) {
+  delete(id: string) {
     this.quizzes = this.quizzes.filter((quiz) => quiz.id !== id);
+    this.updateLocalStorage();
   }
 
   update(updatedQuiz: Quiz) {
     const index = this.quizzes.findIndex((quiz) => quiz.id === updatedQuiz.id);
     if (index !== -1) {
-      this.quizzes[index] = updatedQuiz;
+      this.quizzes[index] = {
+        ...updatedQuiz,
+        updatedAt: new Date(),
+      };
+      this.updateLocalStorage();
     }
   }
-}
 
-export default QuizRepository;
+  private updateLocalStorage() {
+    localStorage.setItem('quizzes', JSON.stringify(this.quizzes));
+  }
+}

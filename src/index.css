@@ -74,10 +74,11 @@ body {
 
 main {
   position: relative;
-  background-image: url('./images/bg-main.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-image: url('./images/bg-main.jpg');
+  background-attachment: fixed;
 }
 
 code {
@@ -187,51 +188,6 @@ code {
   margin-bottom: 24px;
 }
 
-/* Quiz */
-.quiz-component strong {
-  position: relative;
-  z-index: 1;
-}
-.quiz-component strong::before {
-  content: '';
-  position: absolute;
-  z-index: -999;
-  top: 0px;
-  left: 0px;
-  width: calc(100%);
-  height: calc(100%);
-  background-color: var(--gold-2);
-  border: 2px solid var(--gold-3);
-  border-radius: 4px;
-  /* animation: fade-in-out 1s infinite; */
-  user-select: none;
-  pointer-events: none;
-  box-sizing: border-box;
-}
-.quiz-item-card {
-  padding: 8px 16px;
-  background-color: var(--gray-3);
-  border-radius: 8px;
-}
-.quiz-question {
-  position: relative;
-}
-.quiz-question::before{
-  position: absolute;
-  content: "";
-  top: -8px;
-  left: -8px;
-  width: 24px;
-  height: 24px;
-  background-color: var(--red-4);
-  border-radius: 12px;
-  animation: breathe 2s infinite;
-}
-
-/* Quill */
-.ql-toolbar {
-  display: none !important;
-}
 
 /* Display */
 .d-flex {
@@ -262,6 +218,14 @@ code {
   align-items: flex-end;
 }
 
+/* Typo */
+.text-muted {
+  color: var(--gray-7);
+}
+.text-white {
+  color: #fff;
+}
+
 /* Animations */
 @keyframes breathe {
   0%, 100% {
@@ -275,9 +239,61 @@ code {
 }
 @keyframes fade-in-out {
   0%, 100% {
-    opacity: 0.2;
+    opacity: 0.4;
   }
   50% {
     opacity: 1;
   }
+}
+
+/* Quiz */
+.quiz-component strong {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+.quiz-component strong::before {
+  content: '';
+  position: absolute;
+  z-index: -999;
+  top: 0px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100%);
+  background-color: var(--gold-2);
+  border-radius: 4px;
+  user-select: none;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+.quiz-display strong::before {
+  animation: fade-in-out 1s infinite;
+}
+.quiz-item-card {
+  padding: 8px 16px;
+  background-color: var(--gray-3);
+  border-radius: 8px;
+}
+.quiz-question {
+  position: relative;
+  background-color: var(--blue-1);
+  color: var(--blue-8);
+  font-size: 1.08em;
+}
+
+/* Quill */
+.ql-toolbar {
+  display: none !important;
+}
+.ql-editor p {
+  margin: 0;
+}
+.ql-editor ::selection {
+  background-color: var(--gold-5);
+}
+
+/* Ant Design */
+
+.ant-card {
+  background-color: rgba(255, 255, 255, 0.8) !important;
 }

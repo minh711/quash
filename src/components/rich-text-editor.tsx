@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import Quill from 'quill';
 
-const RichTextEditor = ({ content }: { content: string }) => {
+const RichTextEditor = ({ content, id }: { content: string; id: string }) => {
   const editorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -14,12 +14,14 @@ const RichTextEditor = ({ content }: { content: string }) => {
         readOnly: true,
       });
 
+      // content.replace(/&nbsp;/g, ' ');
+
       quill.root.innerHTML = content;
 
       quill.on('selection-change', (range) => {
         if (range && range.length > 0) {
           const selectedText = quill.getText(range.index, range.length);
-          const trimmedText = selectedText.trim(); // Remove leading and trailing spaces
+          const trimmedText = selectedText.trim();
 
           if (trimmedText.length > 0) {
             const trimmedRange =
@@ -36,13 +38,15 @@ const RichTextEditor = ({ content }: { content: string }) => {
               'bold',
               !isBold
             );
+          } else {
+            quill.format('bold', false);
           }
         }
       });
     }
   }, [content]);
 
-  return <div ref={editorRef} />;
+  return <div id={id} ref={editorRef} />;
 };
 
 export default RichTextEditor;

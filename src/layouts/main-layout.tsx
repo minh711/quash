@@ -1,15 +1,20 @@
 import React, { ReactNode } from 'react';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Row, Col, Space, Typography, Button } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   HomeOutlined,
   AppstoreAddOutlined,
   UserOutlined,
+  GithubOutlined,
+  FacebookOutlined,
+  PhoneOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
 const { Header, Sider, Content, Footer } = Layout;
+const { Text } = Typography;
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -65,8 +70,71 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {children}
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>
-          Quash ©2024 Created minh711
+        <Footer
+          style={{
+            textAlign: 'center',
+            backgroundColor: '#001529',
+            color: 'white',
+          }}
+        >
+          <Row justify="center" gutter={24}>
+            <Col>
+              <Space direction="vertical" size="middle">
+                <Text className="text-white">
+                  Quash ©2024 Created by{' '}
+                  <a href="https://github.com/minh711">minh711</a>
+                </Text>
+
+                <Space size="large">
+                  <a
+                    href="tel:+123456789"
+                    style={{ color: 'white' }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <PhoneOutlined /> +84 948 256 104
+                  </a>
+                  <a
+                    href="mailto:minhtd.developer@gmail.com"
+                    style={{ color: 'white' }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MailOutlined /> minhtd.developer@gmail.com
+                  </a>
+                </Space>
+
+                <Space size="large">
+                  <a
+                    href="https://github.com/minh711/quash"
+                    style={{ color: 'white' }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <GithubOutlined /> GitHub
+                  </a>
+                  <a
+                    href="https://www.facebook.com/duyminhtruong711/"
+                    style={{ color: 'white' }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <FacebookOutlined /> Facebook
+                  </a>
+                </Space>
+
+                <a
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSfg99HGRGJNbNzlEh51ZaTUTXhkNjiESa0dZtPrLlVMqNezkw/viewform?usp=sf_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button type="primary" shape="round" size="large">
+                    Report an Issue
+                  </Button>
+                </a>
+              </Space>
+            </Col>
+          </Row>
         </Footer>
       </Layout>
     </Layout>

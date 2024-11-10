@@ -1,7 +1,7 @@
-import QuizRepository from './quiz-repository';
-import UserRepository from './user-repository';
+import { QuizRepository } from './quiz-repository';
+import { UserRepository } from './user-repository';
 
-class DataSource {
+export class DataSource {
   public quizRepository: QuizRepository;
   public userRepository: UserRepository;
 
@@ -19,5 +19,3 @@ class DataSource {
     return DataSource.instance;
   }
 }
-
-export default DataSource.getInstance();

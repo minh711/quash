@@ -1,37 +1,45 @@
-import React, { useState } from 'react';
-import { Card, Button, Input, Row, Col, Divider } from 'antd';
-import { Quiz } from '../../entities/quiz';
+import React, { useEffect, useState } from 'react';
+import { Card, Button, Input, Row, Col } from 'antd';
+import { Answer, Quiz } from '../../entities/quiz';
 import RichTextEditor from '../../components/rich-text-editor';
+import { DataSource } from '../../scripts/data-source';
+import { v4 as uuidv4 } from 'uuid';
+import QuizList from '../../components/quiz-list';
+import { message } from 'antd';
 
 const QuizPage: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
-  // const [question, setQuestion] = useState('');
-  // const [answers, setAnswers] = useState<string[]>([]);
   const [quiz, setQuiz] = useState<Quiz>({
-    id: 1,
+    id: '',
     question: '',
     answers: [],
     correctAnswers: [],
+    groups: [],
+    tags: [],
     answeredCount: 0,
     correctAnsweredCount: 0,
     incorrectAnsweredCount: 0,
     wrathCount: 0,
   });
 
+  // const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+
+  const [quizzes, setQuizzes] = useState<Quiz[]>(() => {
+    const quizRepository = DataSource.getInstance().quizRepository;
+    return quizRepository.getAll();
+  });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setInputValue(value);
-
-    // Split by exactly two newlines (\n\n) to preserve the division between question and answers
     const parts = value.trim().split(/\n{2,}/);
-    console.log(parts.length);
     if (parts.length > 0) {
       const question = parts[0]
         .split('\n')
         .map((line) => `<p>${line}</p>`)
         .join('');
-      const answers = parts.slice(1).map((answer, idx) => ({
-        id: idx + 1,
+      const answers = parts.slice(1).map((answer) => ({
+        id: uuidv4(),
         content: answer
           .split('\n')
           .map((line) => `<p>${line}</p>`)
@@ -47,7 +55,67 @@ const QuizPage: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    alert(`Question: ${quiz.question}\nAnswers: ${quiz.answers.join(', ')}`);
+    const questionContent = document
+      .getElementById('question-editor')
+      ?.querySelector('.ql-editor')?.innerHTML;
+
+    const answers: Answer[] = [];
+    quiz.answers.forEach((_, index) => {
+      const answerContent = document
+        .getElementById(`answer-editor-${index}`)
+        ?.querySelector('.ql-editor')?.innerHTML;
+
+      if (answerContent) {
+        const answer: Answer = {
+          id: uuidv4(),
+          content: answerContent,
+        };
+        answers.push(answer);
+      }
+    });
+
+    if (!questionContent || answers.length === 0) {
+      message.error('Question or answers cannot be empty!');
+      return;
+    }
+
+    const newQuiz: Quiz = {
+      id: uuidv4(),
+      question: questionContent ?? '',
+      answers: answers,
+      correctAnswers: [],
+      answeredCount: 0,
+      correctAnsweredCount: 0,
+      incorrectAnsweredCount: 0,
+      wrathCount: 0,
+      groups: [],
+      tags: [],
+      createdAt: new Date(),
+    };
+
+    setQuizzes((prevQuizzes) => {
+      const updatedQuizzes = [newQuiz, ...prevQuizzes];
+      return updatedQuizzes;
+    });
+
+    const quizRepository = DataSource.getInstance().quizRepository;
+    quizRepository.add(newQuiz);
+
+    setQuiz({
+      id: '',
+      question: '',
+      answers: [],
+      correctAnswers: [],
+      groups: [],
+      tags: [],
+      answeredCount: 0,
+      correctAnsweredCount: 0,
+      incorrectAnsweredCount: 0,
+      wrathCount: 0,
+    });
+    setInputValue('');
+
+    message.success('Quiz added');
   };
 
   return (
@@ -103,20 +171,23 @@ const QuizPage: React.FC = () => {
           </div>
           <Card>
             {!quiz.question ? (
-              <div style={{ color: '#888' }}>
+              <div className="text-muted">
                 <p>Chưa có câu hỏi. Hãy nhập câu hỏi của bạn.</p>
               </div>
             ) : (
               <div>
                 <div className="quiz-item-card quiz-question">
-                  <RichTextEditor content={quiz.question} />
+                  <RichTextEditor
+                    id="question-editor"
+                    content={quiz.question}
+                  />
                 </div>
               </div>
             )}
 
             {/* Show placeholder if there are no answers */}
             {quiz.answers.length === 0 ? (
-              <div style={{ color: '#888' }}>
+              <div className="text-muted">
                 <p>
                   Chưa có câu trả lời. Tách biệt câu hỏi và các câu trả lời bằng
                   một dòng trống.
@@ -130,7 +201,10 @@ const QuizPage: React.FC = () => {
                     key={idx}
                     style={{ marginBottom: 8 }}
                   >
-                    <RichTextEditor content={answer.content} />
+                    <RichTextEditor
+                      id={`answer-editor-${idx}`}
+                      content={answer.content}
+                    />
                   </div>
                 ))}
               </div>
@@ -144,6 +218,10 @@ const QuizPage: React.FC = () => {
             </Button>
           </Card>
         </Col>
+      </Row>
+
+      <Row style={{ marginTop: 16 }}>
+        <QuizList quizzes={quizzes} />
       </Row>
     </div>
   );
