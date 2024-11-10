@@ -27,3 +27,12 @@ export interface Answer {
   id: string;
   content: string;
 }
+
+export interface QuizBundle {
+  id: string;
+  name: string;
+  description?: string;
+  quizzes: Quiz[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}

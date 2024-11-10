@@ -41,6 +41,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <Menu.Item key="3" icon={<UserOutlined />}>
             Profile
           </Menu.Item>
+          {/* Add Menu Item for Quiz Bundle */}
+          <Menu.Item key="4" icon={<AppstoreAddOutlined />}>
+            <Link to="/quiz-bundle">Quiz Bundles</Link>
+          </Menu.Item>
         </Menu>
       </Sider>
       <Layout>

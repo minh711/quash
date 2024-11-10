@@ -133,7 +133,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
         </div>
 
         <Row gutter={[16, 16]}>
-          <Col span={16}>
+          <Col span={24} xs={24} md={16}>
             <Card className="quiz-component quiz-display">
               <div
                 className="quiz-item-card quiz-question"
@@ -152,7 +152,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
               </div>
             </Card>
           </Col>
-          <Col span={8}>
+          <Col span={24} xs={0} md={8}>
             <div className="d-flex">
               <Button
                 type="primary"
