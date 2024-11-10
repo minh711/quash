@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.3.1",
     "antd": "^5.21.6",
     "quash": "file:",
+    "quill": "^2.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0",

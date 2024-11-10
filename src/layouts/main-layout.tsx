@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
-const { Header, Sider, Content } = Layout;
+const { Header, Sider, Content, Footer } = Layout;
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -52,15 +52,22 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           >
             Quash
           </span>
-          {collapsed ? (
-            <MenuUnfoldOutlined className="trigger" onClick={toggle} />
-          ) : (
-            <MenuFoldOutlined className="trigger" onClick={toggle} />
-          )}
         </Header>
-        <Content style={{ margin: '16px' }}>
-          <div style={{ padding: 24, minHeight: 360 }}>{children}</div>
+        <Content>
+          <div
+            style={{
+              paddingLeft: 24,
+              paddingRight: 24,
+              paddingBottom: 24,
+              minHeight: 360,
+            }}
+          >
+            {children}
+          </div>
         </Content>
+        <Footer style={{ textAlign: 'center' }}>
+          Quash ©2024 Created minh711
+        </Footer>
       </Layout>
     </Layout>
   );

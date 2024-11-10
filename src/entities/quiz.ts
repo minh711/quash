@@ -1,7 +1,7 @@
 export interface Quiz {
   id: number;
   question: string;
-  answer: Answer[];
+  answers: Answer[];
   correctAnswers: number[];
   answeredCount: number;
   correctAnsweredCount: number;
