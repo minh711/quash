@@ -16,7 +16,10 @@ const RichTextEditor = ({ content, id }: { content: string; id: string }) => {
 
       console.log(content);
 
-      quill.root.innerHTML = content;
+      // quill.root.innerHTML = content;
+
+      const delta = quill.clipboard.convert({ html: content });
+      quill.setContents(delta);
 
       quill.on('selection-change', (range) => {
         if (range && range.length > 0) {
