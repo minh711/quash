@@ -82,42 +82,38 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               <Space direction="vertical" size="middle">
                 <Text className="text-white">
                   Quash ©2024 Created by{' '}
-                  <a href="https://github.com/minh711">minh711</a>
+                  <a
+                    href="https://github.com/minh711"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    minh711
+                  </a>
                 </Text>
 
                 <Space size="large">
-                  <a
-                    href="tel:+123456789"
-                    style={{ color: 'white' }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Text style={{ color: 'white' }}>
                     <PhoneOutlined /> +84 948 256 104
-                  </a>
-                  <a
-                    href="mailto:minhtd.developer@gmail.com"
-                    style={{ color: 'white' }}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  </Text>
+                  <Text style={{ color: 'white' }}>
                     <MailOutlined /> minhtd.developer@gmail.com
-                  </a>
+                  </Text>
                 </Space>
 
                 <Space size="large">
                   <a
                     href="https://github.com/minh711/quash"
-                    style={{ color: 'white' }}
                     target="_blank"
                     rel="noopener noreferrer"
+                    style={{ color: 'white' }}
                   >
                     <GithubOutlined /> GitHub
                   </a>
                   <a
                     href="https://www.facebook.com/duyminhtruong711/"
-                    style={{ color: 'white' }}
                     target="_blank"
                     rel="noopener noreferrer"
+                    style={{ color: 'white' }}
                   >
                     <FacebookOutlined /> Facebook
                   </a>
