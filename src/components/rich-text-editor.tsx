@@ -14,7 +14,7 @@ const RichTextEditor = ({ content, id }: { content: string; id: string }) => {
         readOnly: true,
       });
 
-      // content.replace(/&nbsp;/g, ' ');
+      console.log(content);
 
       quill.root.innerHTML = content;
 
