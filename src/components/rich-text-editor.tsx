@@ -19,10 +19,24 @@ const RichTextEditor = ({ content }: { content: string }) => {
       quill.on('selection-change', (range) => {
         if (range && range.length > 0) {
           const selectedText = quill.getText(range.index, range.length);
-          if (selectedText.trim().length === 0) return; // Ignore if only spaces are selected
+          const trimmedText = selectedText.trim(); // Remove leading and trailing spaces
 
-          const isBold = quill.getFormat(range).bold;
-          quill.format('bold', !isBold);
+          if (trimmedText.length > 0) {
+            const trimmedRange =
+              range.index + selectedText.indexOf(trimmedText);
+            const endIndex = trimmedRange + trimmedText.length;
+
+            const isBold = quill.getFormat(
+              trimmedRange,
+              endIndex - trimmedRange
+            ).bold;
+            quill.formatText(
+              trimmedRange,
+              endIndex - trimmedRange,
+              'bold',
+              !isBold
+            );
+          }
         }
       });
     }
