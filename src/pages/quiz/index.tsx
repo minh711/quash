@@ -1,5 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Button, Input, Row, Col, Collapse, Modal, Form } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Card,
+  Button,
+  Input,
+  Row,
+  Col,
+  Collapse,
+  Modal,
+  Form,
+  Tour,
+} from 'antd';
 import { Answer, Quiz, QuizBundle } from '../../entities/quiz';
 import RichTextEditor from '../../components/rich-text-editor';
 import { DataSource } from '../../scripts/data-source';
@@ -12,6 +22,15 @@ import { CaretRightOutlined } from '@ant-design/icons';
 const { Panel } = Collapse;
 
 const QuizPage: React.FC = () => {
+  const ref1 = useRef(null);
+  const steps = [
+    {
+      title: 'Tạo câu hỏi mới',
+      description: 'Bạn có thể điền câu hỏi mới một cách thủ công ở đây.',
+      target: () => ref1.current,
+    },
+  ];
+
   const { id } = useParams();
   const quizBundleId = id;
 
@@ -168,8 +187,14 @@ const QuizPage: React.FC = () => {
     }
   };
 
+  const [open, setOpen] = useState(false);
+
   return (
     <div>
+      <Button type="primary" onClick={() => setOpen(true)}>
+        Begin non-modal Tour
+      </Button>
+
       <div className="d-flex justify-content-between align-items-center">
         <h2>{quizBundle.name}</h2>
         <Button
@@ -185,6 +210,7 @@ const QuizPage: React.FC = () => {
       <p className="text-muted">{quizBundle.description}</p>
 
       <Collapse
+        ref={ref1}
         defaultActiveKey={[]}
         expandIcon={({ isActive }) => (
           <CaretRightOutlined rotate={isActive ? 90 : 0} />
@@ -315,6 +341,14 @@ const QuizPage: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        mask={false}
+        type="primary"
+        steps={steps}
+      />
     </div>
   );
 };

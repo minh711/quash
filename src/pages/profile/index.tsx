@@ -211,7 +211,8 @@ const ProfilePage: React.FC = () => {
         footer={null}
         width={800}
       >
-        <div className="d-flex justify-content-end">
+        <div className="d-flex justify-content-between">
+          <div className="text-muted">Chọn xong nhớ F5 lại trang nhé!</div>
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSfg99HGRGJNbNzlEh51ZaTUTXhkNjiESa0dZtPrLlVMqNezkw/viewform?usp=sf_link"
             target="_blank"

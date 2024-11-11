@@ -70,8 +70,22 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
   return (
     <div style={{ width: '100%' }}>
       <h3>
-        Danh sách câu hỏi của bạn (hiển thị {currentPage * pageSize}/{quizCount}
-        )
+        Danh sách câu hỏi của bạn:
+        {quizCount !== 0 ? (
+          <>
+            hiển thị {currentPage * pageSize}/{quizCount}
+          </>
+        ) : (
+          <>
+            <br></br>
+            <div
+              style={{ fontWeight: 'normal', marginTop: 16 }}
+              className="text-muted"
+            >
+              Chưa có câu hỏi nào
+            </div>
+          </>
+        )}
       </h3>{' '}
       <div>
         {quizList.map((quiz: Quiz) => (

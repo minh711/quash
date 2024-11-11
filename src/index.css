@@ -225,6 +225,9 @@ code {
 .text-white {
   color: #fff;
 }
+.text-center {
+  text-align: center;
+}
 
 /* Animations */
 @keyframes breathe {
