@@ -91,9 +91,8 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
         {quizList.map((quiz: Quiz) => (
           <QuizDisplay
             key={quiz.id}
-            originQuiz={quiz}
-            onDelete={deleteQuiz}
-            onUpdate={handleUpdate}
+            quizId={quiz.id}
+            quizBundleId={quiz.quizBundleId!}
           />
         ))}
 

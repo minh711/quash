@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Col, Row, Button, Modal, Input, Popconfirm } from 'antd';
 import { Quiz, Answer } from '../entities/quiz';
 import RichTextEditor from './rich-text-editor';
@@ -7,19 +7,19 @@ import { v4 as uuidv4 } from 'uuid';
 import QuizChart from './quiz-chart';
 
 interface QuizDisplayProps {
-  originQuiz: Quiz;
-  onDelete: (quizId: string) => void;
-  onUpdate: (updatedQuiz: Quiz) => void;
+  quizId: string;
+  quizBundleId: string;
 }
 
-const QuizDisplay: React.FC<QuizDisplayProps> = ({
-  originQuiz,
-  onDelete,
-  onUpdate,
-}) => {
+const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
+  const [quiz, setQuiz] = useState<Quiz>(() => {
+    const quizRepository = DataSource.getInstance().quizRepository;
+    const quiz = quizRepository.getById(quizId, quizBundleId)!;
+    return quiz;
+  });
+
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [quiz, setQuiz] = useState<Quiz>(originQuiz);
-  const [stateQuiz, setStateQuiz] = useState<Quiz>(originQuiz);
+
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   const originQuizTextarea = `${quiz.question
@@ -44,7 +44,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
   const [inputValue, setInputValue] = useState(quizTextarea);
 
   const handleAnswerSelect = (id: string) => {
-    setStateQuiz((prevState) => ({
+    setQuiz((prevState) => ({
       ...prevState,
       correctAnswers: prevState.correctAnswers.includes(id)
         ? prevState.correctAnswers.filter((item) => item !== id)
@@ -53,18 +53,20 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
   };
 
   const showModal = () => {
-    setStateQuiz(quiz);
+    const quizRepository = DataSource.getInstance().quizRepository;
+    const originQuiz = quizRepository.getById(quizId, quizBundleId)!;
+    setQuiz(originQuiz);
     setIsModalVisible(true);
   };
 
   const handleOk = () => {
     const questionContent = document
-      .getElementById('question-editor')
+      .getElementById(`question-editor-${quiz.id}`)
       ?.querySelector('.ql-editor')?.innerHTML;
     const answers: Answer[] = [];
     quiz.answers.forEach((item, index) => {
       const answerContent = document
-        .getElementById(`answer-editor-${index}`)
+        .getElementById(`answer-editor-${quiz.id}-${index}`)
         ?.querySelector('.ql-editor')?.innerHTML;
       if (answerContent) {
         const answer: Answer = {
@@ -75,28 +77,36 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
       }
     });
 
-    stateQuiz.question = questionContent ?? '';
-    stateQuiz.answers = answers;
-
-    quiz.question = questionContent ?? '';
-    quiz.answers = answers;
+    console.log('Update', questionContent);
+    console.log('Update', answers);
 
     setQuiz({
       ...quiz,
       question: questionContent ?? '',
       answers: answers,
-      correctAnswers: stateQuiz.correctAnswers,
+      correctAnswers: quiz.correctAnswers,
     });
 
+    setQuiz(quiz);
+
     const quizRepository = DataSource.getInstance().quizRepository;
-    quizRepository.update(stateQuiz);
-    console.log('Quiz', quiz);
-    console.log('Quiz answers', quiz.answers);
-    onUpdate(quiz);
+    quizRepository.update({
+      ...quiz,
+      question: questionContent ?? '',
+      answers: answers,
+      correctAnswers: quiz.correctAnswers,
+    });
+
+    const originQuiz = quizRepository.getById(quizId, quizBundleId)!;
+    setQuiz(originQuiz);
+
     setIsModalVisible(false);
   };
 
   const handleCancel = () => {
+    const quizRepository = DataSource.getInstance().quizRepository;
+    const originQuiz = quizRepository.getById(quizId, quizBundleId)!;
+    setQuiz(originQuiz);
     setInputValue(originQuizTextarea);
     setIsModalVisible(false);
   };
@@ -122,18 +132,17 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
           .join(''),
       }));
 
-      setStateQuiz((prevQuiz) => ({
-        ...prevQuiz,
+      setQuiz({
+        ...quiz,
         question,
         answers: answers,
-      }));
+      });
     }
   };
 
   const handleDeleteConfirm = () => {
     const quizRepository = DataSource.getInstance().quizRepository;
     quizRepository.delete(quiz.id, quiz.quizBundleId!);
-    onDelete(quiz.id);
   };
 
   const handleDelete = () => {
@@ -222,6 +231,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
           okText="Cập nhật"
           cancelText="Hủy bỏ"
           width={1200}
+          maskClosable={false}
         >
           <Row gutter={16} align="stretch">
             {/* TextArea input section */}
@@ -261,7 +271,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
             >
               <h3>Câu hỏi của bạn</h3>
               <Card>
-                {!stateQuiz.question ? (
+                {!quiz.question ? (
                   <div className="text-muted">
                     <p>Chưa có câu hỏi. Hãy nhập câu hỏi của bạn.</p>
                   </div>
@@ -269,15 +279,15 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
                   <div>
                     <div className="quiz-item-card quiz-question">
                       <RichTextEditor
-                        id="question-editor"
-                        content={stateQuiz.question}
+                        id={`question-editor-${quiz.id}`}
+                        content={quiz.question}
                       />
                     </div>
                   </div>
                 )}
 
                 {/* Show placeholder if there are no answers */}
-                {stateQuiz.answers.length === 0 ? (
+                {quiz.answers.length === 0 ? (
                   <div className="text-muted">
                     <p>
                       Chưa có câu trả lời. Tách biệt câu hỏi và các câu trả lời
@@ -286,10 +296,10 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
                   </div>
                 ) : (
                   <div style={{ marginTop: 24 }}>
-                    {stateQuiz.answers.map((answer, idx) => (
+                    {quiz.answers.map((answer, idx) => (
                       <div
                         className={`quiz-item-card quiz-answer ${
-                          stateQuiz.correctAnswers.includes(answer.id)
+                          quiz.correctAnswers.includes(answer.id)
                             ? 'selected'
                             : ''
                         }`}
@@ -302,7 +312,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
                         onClick={() => handleAnswerSelect(answer.id)}
                       >
                         <RichTextEditor
-                          id={`answer-editor-${idx}`}
+                          id={`answer-editor-${quiz.id}-${idx}`}
                           content={answer.content}
                         />
                       </div>
