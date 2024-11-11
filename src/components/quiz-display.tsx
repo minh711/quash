@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, Col, Row, Button, Modal, Input, Popconfirm } from 'antd';
 import { Quiz, Answer } from '../entities/quiz';
 import RichTextEditor from './rich-text-editor';
@@ -78,12 +78,16 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
     stateQuiz.question = questionContent ?? '';
     stateQuiz.answers = answers;
 
+    quiz.question = questionContent ?? '';
+    quiz.answers = answers;
+
     setQuiz({
       ...quiz,
+      question: questionContent ?? '',
+      answers: answers,
       correctAnswers: stateQuiz.correctAnswers,
     });
 
-    // setQuiz(stateQuiz);
     const quizRepository = DataSource.getInstance().quizRepository;
     quizRepository.update(stateQuiz);
     console.log('Quiz', quiz);
