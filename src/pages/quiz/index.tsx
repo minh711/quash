@@ -17,7 +17,7 @@ import { v4 as uuidv4 } from 'uuid';
 import QuizList from '../../components/quiz-list';
 import { message } from 'antd';
 import { useParams } from 'react-router-dom';
-import { CaretRightOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 const { Panel } = Collapse;
 
@@ -191,12 +191,24 @@ const QuizPage: React.FC = () => {
 
   return (
     <div>
-      <Button type="primary" onClick={() => setOpen(true)}>
-        Begin non-modal Tour
-      </Button>
-
       <div className="d-flex justify-content-between align-items-center">
-        <h2>{quizBundle.name}</h2>
+        <div style={{ marginBottom: 8 }}>
+          <div className="d-flex align-items-end">
+            <h2 style={{ marginBottom: 0, marginRight: 16 }}>
+              {quizBundle.name}
+            </h2>
+            <Button
+              icon={<QuestionCircleOutlined />}
+              color="danger"
+              variant="solid"
+              onClick={() => setOpen(true)}
+            >
+              Hướng dẫn sử dụng
+            </Button>
+          </div>
+          <p className="text-muted">{quizBundle.description}</p>
+        </div>
+
         <Button
           color="danger"
           size="large"
@@ -207,7 +219,6 @@ const QuizPage: React.FC = () => {
           Import CSV
         </Button>
       </div>
-      <p className="text-muted">{quizBundle.description}</p>
 
       <Collapse
         ref={ref1}

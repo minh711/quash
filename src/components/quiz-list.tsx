@@ -57,9 +57,6 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
   };
 
   const handleUpdate = (updatedQuiz: Quiz) => {
-    console.log('HERE');
-    console.log('Updated quiz', updatedQuiz);
-    console.log('Updated quiz answers', updatedQuiz.answers);
     setQuizList((prevQuizzes) =>
       prevQuizzes.map((quiz) =>
         quiz.id === updatedQuiz.id ? updatedQuiz : quiz
@@ -70,11 +67,14 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
   return (
     <div style={{ width: '100%' }}>
       <h3>
-        Danh sách câu hỏi của bạn:
+        Danh sách câu hỏi của bạn
         {quizCount !== 0 ? (
-          <>
-            hiển thị {currentPage * pageSize}/{quizCount}
-          </>
+          <span className="text-muted">
+            {' '}
+            (hiển thị{' '}
+            {quizCount < pageSize ? quizCount : currentPage * pageSize}/
+            {quizCount})
+          </span>
         ) : (
           <>
             <br></br>

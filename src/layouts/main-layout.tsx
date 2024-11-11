@@ -12,6 +12,7 @@ import {
   Upload,
   Modal,
   message,
+  Tooltip,
 } from 'antd';
 import {
   MenuUnfoldOutlined,
@@ -26,6 +27,7 @@ import {
   MenuOutlined,
   UploadOutlined,
   DownloadOutlined,
+  ToolOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { DataSource } from '../scripts/data-source';
@@ -139,7 +141,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           <Menu.Item key="2" icon={<AppstoreAddOutlined />}>
             <Link to="/quiz-bundle">Các gói câu hỏi</Link>
           </Menu.Item>
-          <Menu.SubMenu
+          {/* <Menu.SubMenu
             key="3"
             icon={<AppstoreAddOutlined />}
             title="Chọn nhanh"
@@ -148,14 +150,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           >
             {quizBundles.map((bundle) => (
               <Menu.Item key={bundle.id}>
-                <Link to={`/quiz/${bundle.id}`}>{bundle.name}</Link>
+                <Tooltip
+                  title="Nhấn đề truy cập nhanh vào một gói câu hỏi"
+                  placement="right"
+                >
+                  <Link to={`/quiz/${bundle.id}`}>{bundle.name}</Link>
+                </Tooltip>
               </Menu.Item>
             ))}
-          </Menu.SubMenu>
+          </Menu.SubMenu> */}
 
           <Menu.SubMenu
             key="4"
-            icon={<AppstoreAddOutlined />}
+            icon={<ToolOutlined />}
             title="Cài đặt"
             style={{ maxHeight: '600px', overflowY: 'auto' }}
             className="scrollable-submenu"

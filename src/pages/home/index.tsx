@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Card, Carousel } from 'antd';
 import { Link } from 'react-router-dom';
-import Particles from 'react-tsparticles';
 
 const HomePage: React.FC = () => {
   return (
