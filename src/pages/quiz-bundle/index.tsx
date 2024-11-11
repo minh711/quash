@@ -11,11 +11,13 @@ import {
   Form,
   message,
   Tag,
+  Popconfirm,
 } from 'antd';
 import { DataSource } from '../../scripts/data-source';
 import { Quiz, QuizBundle } from '../../entities/quiz';
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { QuizBundleRepository } from '../../scripts/quiz-bundle-repository';
 
 const QuizBundlePage: React.FC = () => {
   const [quizBundles, setQuizBundles] = useState<QuizBundle[]>([]);
@@ -23,6 +25,11 @@ const QuizBundlePage: React.FC = () => {
   const [currentQuizBundle, setCurrentQuizBundle] = useState<QuizBundle | null>(
     null
   );
+  const [confirmVisible, setConfirmVisible] = useState<string | null>(null);
+  const [currentQuizBundleId, setCurrentQuizBundleId] = useState<string | null>(
+    null
+  );
+
   const [form] = Form.useForm();
 
   const dataSource = DataSource.getInstance().quizBundleRepository;
@@ -66,6 +73,15 @@ const QuizBundlePage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
+    setConfirmVisible(id);
+    setCurrentQuizBundleId(id);
+  };
+
+  const handleDeleteCancel = () => {
+    setConfirmVisible(null);
+  };
+
+  const handleDeleteConfirm = (id: string) => {
     dataSource.delete(id);
     setQuizBundles(quizBundles.filter((bundle) => bundle.id !== id));
     message.success('Quiz Bundle Deleted');
@@ -85,6 +101,8 @@ const QuizBundlePage: React.FC = () => {
       key: 'name',
       width: 300,
       render: (text: string, item: QuizBundle) => {
+        const quizCount = localStorage.getItem(`${item.id}-count`) || '0';
+
         const colors: string[] = [
           'magenta',
           'red',
@@ -108,7 +126,10 @@ const QuizBundlePage: React.FC = () => {
               style={{ fontSize: '16px', padding: '12px 12px', width: '100%' }}
               className={isPreset ? 'preset-bundle' : ''}
             >
-              {text}
+              <span style={{ fontSize: '20px', fontWeight: 'bold' }}>
+                {text}
+              </span>{' '}
+              ({quizCount} câu)
             </Tag>
           </Link>
         );
@@ -129,13 +150,24 @@ const QuizBundlePage: React.FC = () => {
           <Button onClick={() => handleEdit(record)} type="primary">
             Edit
           </Button>
-          <Button
-            color="danger"
-            variant="solid"
-            onClick={() => handleDelete(record.id)}
-          >
-            Delete
-          </Button>
+          <div>
+            <Button
+              color="danger"
+              variant="solid"
+              onClick={() => handleDelete(record.id)}
+            >
+              Delete
+            </Button>
+
+            <Popconfirm
+              title="Are you sure you want to delete the quiz? This action cannot be undone."
+              open={confirmVisible === record.id}
+              onConfirm={() => handleDeleteConfirm(currentQuizBundleId ?? '')}
+              onCancel={handleDeleteCancel}
+              okText="Yes"
+              cancelText="No"
+            />
+          </div>
         </Space>
       ),
     },

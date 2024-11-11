@@ -72,6 +72,9 @@ export class QuizBundleRepository {
       (bundle) => bundle.id !== bundleId
     );
     this.updateLocalStorage();
+
+    localStorage.removeItem(`${bundleId}-count`);
+    localStorage.removeItem(`${bundleId}`);
   }
 
   update(updatedBundle: QuizBundle) {

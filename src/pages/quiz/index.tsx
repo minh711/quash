@@ -99,9 +99,6 @@ const QuizPage: React.FC = () => {
       return;
     }
 
-    console.log('Selected answers: ', selectedAnswers);
-    console.log('Answers: ', quiz.answers);
-
     const newQuiz: Quiz = {
       id: uuidv4(),
       question: questionContent ?? '',
