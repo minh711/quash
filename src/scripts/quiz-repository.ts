@@ -1,48 +1,117 @@
 import { Quiz } from '../entities/quiz';
+import { ImportQuiz } from './import-quiz';
 
 export class QuizRepository {
-  private quizzes: Quiz[] = JSON.parse(localStorage.getItem('quizzes') || '[]');
+  private importQuiz: ImportQuiz;
 
-  add(quiz: Quiz) {
-    const newQuiz = {
-      ...quiz,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.quizzes.push(newQuiz);
-    this.updateLocalStorage();
+  constructor() {
+    this.importQuiz = new ImportQuiz();
+    this.migrateOldQuizzes();
   }
 
-  getAll(): Quiz[] {
-    return this.quizzes.sort((a, b) => {
-      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : -Infinity; // Treat null as very old date
-      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : -Infinity; // Treat null as very old date
+  private migrateOldQuizzes() {
+    const quizzesFromStorage = JSON.parse(
+      localStorage.getItem('quizzes') || '[]'
+    );
 
-      return dateB - dateA; // Newest first
-    });
-  }
+    if (quizzesFromStorage.length > 0) {
+      const migratedQuizzes = quizzesFromStorage.map((quiz: any) => ({
+        ...quiz,
+        quizBundleId: 'old-quizzes',
+      }));
 
-  getById(id: string): Quiz | undefined {
-    return this.quizzes.find((quiz) => quiz.id === id);
-  }
+      localStorage.setItem('old-quizzes', JSON.stringify(migratedQuizzes));
 
-  delete(id: string) {
-    this.quizzes = this.quizzes.filter((quiz) => quiz.id !== id);
-    this.updateLocalStorage();
-  }
+      localStorage.setItem(
+        'old-quizzes-count',
+        migratedQuizzes.length.toString()
+      );
 
-  update(updatedQuiz: Quiz) {
-    const index = this.quizzes.findIndex((quiz) => quiz.id === updatedQuiz.id);
-    if (index !== -1) {
-      this.quizzes[index] = {
-        ...updatedQuiz,
-        updatedAt: new Date(),
-      };
-      this.updateLocalStorage();
+      localStorage.removeItem('quizzes');
     }
   }
 
-  private updateLocalStorage() {
-    localStorage.setItem('quizzes', JSON.stringify(this.quizzes));
+  importCsvData(csv: string, bundleId: string) {
+    const importedQuizzes = this.importQuiz.importCsv(csv, bundleId);
+    importedQuizzes.forEach((quiz) => this.add(quiz));
+  }
+
+  add(quiz: Quiz) {
+    const newQuiz = { ...quiz, createdAt: new Date(), updatedAt: new Date() };
+    const bundleId = quiz.quizBundleId || 'default-bundle';
+
+    this.updateLocalStorage(bundleId, newQuiz);
+    this.incrementQuizCount(bundleId);
+  }
+
+  getById(id: string, bundleId: string): Quiz | undefined {
+    const quizzesForBundle = this.getQuizzesForBundle(bundleId);
+    return quizzesForBundle.find((quiz: any) => quiz.id === id);
+  }
+
+  getByBundleId(bundleId: string, page = 1, pageSize = 10): Quiz[] {
+    const quizzesForBundle = this.getQuizzesForBundle(bundleId);
+
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+
+    return quizzesForBundle
+      .sort(
+        (a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+      .slice(startIndex, endIndex);
+  }
+
+  delete(id: string, bundleId: string) {
+    const quizzesForBundle = this.getQuizzesForBundle(bundleId);
+    const updatedQuizzes = quizzesForBundle.filter(
+      (quiz: any) => quiz.id !== id
+    );
+    this.updateLocalStorage(bundleId, updatedQuizzes);
+    this.decrementQuizCount(bundleId);
+  }
+
+  update(updatedQuiz: Quiz) {
+    const quizzesForBundle = this.getQuizzesForBundle(
+      updatedQuiz.quizBundleId!
+    );
+    const index = quizzesForBundle.findIndex(
+      (quiz: any) => quiz.id === updatedQuiz.id
+    );
+
+    if (index !== -1) {
+      quizzesForBundle[index] = { ...updatedQuiz, updatedAt: new Date() };
+      this.updateLocalStorage(updatedQuiz.quizBundleId!, quizzesForBundle);
+    }
+  }
+
+  private getQuizzesForBundle(bundleId: string): Quiz[] {
+    return JSON.parse(localStorage.getItem(bundleId) || '[]');
+  }
+
+  private updateLocalStorage(
+    bundleId: string,
+    quizzesForBundle: Quiz | Quiz[] = []
+  ) {
+    const currentQuizzes = JSON.parse(localStorage.getItem(bundleId) || '[]');
+    const updatedQuizzes = Array.isArray(quizzesForBundle)
+      ? quizzesForBundle
+      : [...currentQuizzes, quizzesForBundle];
+    localStorage.setItem(bundleId, JSON.stringify(updatedQuizzes));
+  }
+
+  private incrementQuizCount(bundleId: string) {
+    const currentCount = Number(
+      localStorage.getItem(`${bundleId}-count`) || '0'
+    );
+    localStorage.setItem(`${bundleId}-count`, (currentCount + 1).toString());
+  }
+
+  private decrementQuizCount(bundleId: string) {
+    const currentCount = Number(
+      localStorage.getItem(`${bundleId}-count`) || '0'
+    );
+    localStorage.setItem(`${bundleId}-count`, (currentCount - 1).toString());
   }
 }

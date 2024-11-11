@@ -1,5 +1,14 @@
-import React, { ReactNode } from 'react';
-import { Layout, Menu, Row, Col, Space, Typography, Button } from 'antd';
+import React, { ReactNode, useEffect, useState } from 'react';
+import {
+  Layout,
+  Menu,
+  Row,
+  Col,
+  Space,
+  Typography,
+  Button,
+  Avatar,
+} from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -12,6 +21,8 @@ import {
   MailOutlined,
 } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { DataSource } from '../scripts/data-source';
+import { User } from '../entities/user';
 
 const { Header, Sider, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -27,23 +38,27 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     setCollapsed(!collapsed);
   };
 
+  const [user, setUser] = useState<User | undefined>(undefined);
+
+  useEffect(() => {
+    const userRepository = DataSource.getInstance().userRepository;
+    const fetchedUser = userRepository.getById(null);
+    setUser(fetchedUser);
+  }, []);
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={toggle}>
         <div className="logo" />
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
           <Menu.Item key="1" icon={<HomeOutlined />}>
-            Home
+            Trang chủ
           </Menu.Item>
-          <Menu.Item key="2" icon={<AppstoreAddOutlined />}>
-            <Link to="/quiz">Quiz</Link>
+          <Menu.Item key="4" icon={<AppstoreAddOutlined />}>
+            <Link to="/quiz-bundle">Gói câu hỏi</Link>
           </Menu.Item>
           <Menu.Item key="3" icon={<UserOutlined />}>
-            Profile
-          </Menu.Item>
-          {/* Add Menu Item for Quiz Bundle */}
-          <Menu.Item key="4" icon={<AppstoreAddOutlined />}>
-            <Link to="/quiz-bundle">Quiz Bundles</Link>
+            <Link to="/profile">Profile</Link>
           </Menu.Item>
         </Menu>
       </Sider>
@@ -61,6 +76,34 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           >
             Quash
           </span>
+          {user && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginRight: '16px',
+              }}
+            >
+              <Link
+                to="/profile"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  marginRight: '16px',
+                  color: 'white',
+                }}
+              >
+                <Text style={{ color: 'white', marginRight: 8 }}>
+                  {user.name}
+                </Text>
+                <Avatar
+                  src={user.avatar}
+                  size={40}
+                  style={{ marginRight: '8px' }}
+                />
+              </Link>
+            </div>
+          )}
         </Header>
         <Content>
           <div

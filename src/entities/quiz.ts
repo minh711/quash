@@ -21,6 +21,7 @@ export interface Quiz {
   groups: QuizGroup[];
   createdAt?: Date;
   updatedAt?: Date;
+  quizBundleId?: string;
 }
 
 export interface Answer {
@@ -32,7 +33,7 @@ export interface QuizBundle {
   id: string;
   name: string;
   description?: string;
-  quizzes: Quiz[];
   createdAt?: Date;
   updatedAt?: Date;
+  isPreset: boolean;
 }

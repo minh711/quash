@@ -14,8 +14,6 @@ const RichTextEditor = ({ content, id }: { content: string; id: string }) => {
         readOnly: true,
       });
 
-      console.log(content);
-
       const delta = quill.clipboard.convert({ html: content });
       quill.setContents(delta);
 

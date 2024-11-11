@@ -36,6 +36,15 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
 
   const [inputValue, setInputValue] = useState(quizTextarea);
 
+  const handleAnswerSelect = (id: string) => {
+    setStateQuiz((prevState) => ({
+      ...prevState,
+      correctAnswers: prevState.correctAnswers.includes(id)
+        ? prevState.correctAnswers.filter((item) => item !== id)
+        : [...prevState.correctAnswers, id],
+    }));
+  };
+
   const showModal = () => {
     setStateQuiz(quiz); // Load the quiz content into the modal
     setIsModalVisible(true);
@@ -47,14 +56,14 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
       ?.querySelector('.ql-editor')?.innerHTML;
 
     const answers: Answer[] = [];
-    quiz.answers.forEach((_, index) => {
+    quiz.answers.forEach((item, index) => {
       const answerContent = document
         .getElementById(`answer-editor-${index}`)
         ?.querySelector('.ql-editor')?.innerHTML;
 
       if (answerContent) {
         const answer: Answer = {
-          id: uuidv4(),
+          id: item.id,
           content: answerContent,
         };
         answers.push(answer);
@@ -105,7 +114,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
 
   const handleDeleteConfirm = () => {
     const quizRepository = DataSource.getInstance().quizRepository;
-    quizRepository.delete(quiz.id); // Delete the quiz from the repository
+    quizRepository.delete(quiz.id, quiz.quizBundleId!); // Delete the quiz from the repository
     onDelete(quiz.id); // Notify parent about deletion
   };
 
@@ -141,9 +150,9 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
               ></div>
 
               <div style={{ marginTop: 24 }}>
-                {quiz.answers.map((answer: Answer, index: number) => (
+                {quiz.answers.map((answer: Answer) => (
                   <div
-                    className="quiz-item-card"
+                    className={`quiz-item-card quiz-answer ${quiz.correctAnswers.includes(answer.id) ? 'selected' : ''}`}
                     key={answer.id}
                     style={{ marginBottom: 8 }}
                     dangerouslySetInnerHTML={{ __html: answer.content }}
@@ -256,9 +265,18 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
                   <div style={{ marginTop: 24 }}>
                     {stateQuiz.answers.map((answer, idx) => (
                       <div
-                        className="quiz-item-card"
+                        className={`quiz-item-card quiz-answer ${
+                          stateQuiz.correctAnswers.includes(answer.id)
+                            ? 'selected'
+                            : ''
+                        }`}
                         key={idx}
-                        style={{ marginBottom: 8 }}
+                        style={{
+                          marginBottom: 8,
+                          cursor: 'pointer',
+                          transition: 'background-color 0.3s ease',
+                        }}
+                        onClick={() => handleAnswerSelect(answer.id)}
                       >
                         <RichTextEditor
                           id={`answer-editor-${idx}`}

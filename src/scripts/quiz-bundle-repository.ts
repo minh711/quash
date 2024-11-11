@@ -5,6 +5,45 @@ export class QuizBundleRepository {
     localStorage.getItem('quizBundles') || '[]'
   );
 
+  constructor() {
+    this.initializePresetBundle();
+  }
+
+  private initializePresetBundle() {
+    const presetId1 = 'preset-bundle-1';
+    const presetId2 = 'old-quizzes'; // New preset ID
+
+    // Check if the first preset bundle exists
+    if (!this.quizBundles.some((bundle) => bundle.id === presetId1)) {
+      const veryPastDate = new Date(0); // January 1, 1970
+      const presetBundle1: QuizBundle = {
+        id: presetId1,
+        name: 'Preset Quiz Bundle',
+        description: 'This is a preset quiz bundle.',
+        createdAt: veryPastDate,
+        updatedAt: veryPastDate,
+        isPreset: true,
+      };
+      this.quizBundles.push(presetBundle1);
+    }
+
+    // Check if the second preset bundle exists
+    if (!this.quizBundles.some((bundle) => bundle.id === presetId2)) {
+      const veryPastDate = new Date(0); // January 1, 1970
+      const presetBundle2: QuizBundle = {
+        id: presetId2,
+        name: 'Old Quizzes Bundle',
+        description: 'This bundle contains old quizzes.',
+        createdAt: veryPastDate,
+        updatedAt: veryPastDate,
+        isPreset: true,
+      };
+      this.quizBundles.push(presetBundle2);
+    }
+
+    this.updateLocalStorage();
+  }
+
   add(bundle: QuizBundle) {
     const newBundle = {
       ...bundle,
@@ -26,11 +65,6 @@ export class QuizBundleRepository {
 
   getById(id: string): QuizBundle | undefined {
     return this.quizBundles.find((bundle) => bundle.id === id);
-  }
-
-  getQuizzesByBundleId(bundleId: string): Quiz[] | undefined {
-    const bundle = this.getById(bundleId);
-    return bundle?.quizzes;
   }
 
   delete(bundleId: string) {
