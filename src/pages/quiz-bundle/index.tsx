@@ -1,90 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import {
   Button,
-  Card,
-  Col,
-  Row,
-  Space,
-  Table,
-  Modal,
-  Input,
   Form,
+  Input,
+  Modal,
+  Table,
   message,
-  Tag,
   Popconfirm,
+  Tag,
 } from 'antd';
+import { QuizBundle } from '../../entities/quiz';
 import { DataSource } from '../../scripts/data-source';
-import { Quiz, QuizBundle } from '../../entities/quiz';
 import { Link } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
-import { QuizBundleRepository } from '../../scripts/quiz-bundle-repository';
 
 const QuizBundlePage: React.FC = () => {
   const [quizBundles, setQuizBundles] = useState<QuizBundle[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [currentQuizBundle, setCurrentQuizBundle] = useState<QuizBundle | null>(
-    null
-  );
-  const [confirmVisible, setConfirmVisible] = useState<string | null>(null);
-  const [currentQuizBundleId, setCurrentQuizBundleId] = useState<string | null>(
-    null
-  );
-
+  const [editingBundle, setEditingBundle] = useState<QuizBundle | null>(null);
   const [form] = Form.useForm();
 
-  const dataSource = DataSource.getInstance().quizBundleRepository;
-  const quizRepository = DataSource.getInstance().quizRepository;
+  const quizBundleRepository = DataSource.getInstance().quizBundleRepository;
 
   useEffect(() => {
-    setQuizBundles(dataSource.getAll());
+    setQuizBundles(quizBundleRepository.getAll());
   }, []);
 
-  const handleAddOrUpdate = (values: any) => {
-    const newBundle: QuizBundle = {
-      id: currentQuizBundle ? currentQuizBundle.id : uuidv4(),
-      name: values.name,
-      isPreset: false,
-    };
-
-    if (currentQuizBundle) {
-      setQuizBundles((quizBundles) =>
-        quizBundles.map((bundle) =>
-          bundle.id === newBundle.id ? newBundle : bundle
-        )
-      );
-      dataSource.update(newBundle);
-      message.success('Quiz Bundle Updated');
-    } else {
-      setQuizBundles((quizBundles) => [newBundle, ...quizBundles]);
-      dataSource.add(newBundle);
-      message.success('Quiz Bundle Added');
-    }
-
-    setIsModalVisible(false);
-    form.resetFields();
+  const handleAdd = () => {
+    form.validateFields().then((values) => {
+      const newBundle = {
+        ...values,
+        id: Math.random().toString(36).substr(2, 9),
+        isPreset: false,
+      };
+      quizBundleRepository.add(newBundle);
+      setQuizBundles(quizBundleRepository.getAll());
+      form.resetFields();
+      setIsModalVisible(false);
+      message.success('Quiz bundle added');
+    });
   };
 
-  const handleEdit = (quizBundle: QuizBundle) => {
-    setCurrentQuizBundle(quizBundle);
-    form.setFieldsValue({
-      name: quizBundle.name,
-    });
-    setIsModalVisible(true);
+  const handleUpdate = () => {
+    if (editingBundle) {
+      form.validateFields().then((values) => {
+        const updatedBundle = { ...editingBundle, ...values };
+        quizBundleRepository.update(updatedBundle);
+        setQuizBundles(quizBundleRepository.getAll());
+        setEditingBundle(null);
+        setIsModalVisible(false);
+        message.success('Quiz bundle updated');
+      });
+    }
   };
 
   const handleDelete = (id: string) => {
-    setConfirmVisible(id);
-    setCurrentQuizBundleId(id);
+    quizBundleRepository.delete(id);
+    setQuizBundles(quizBundleRepository.getAll());
+    message.success('Quiz bundle deleted');
   };
 
-  const handleDeleteCancel = () => {
-    setConfirmVisible(null);
-  };
-
-  const handleDeleteConfirm = (id: string) => {
-    dataSource.delete(id);
-    setQuizBundles(quizBundles.filter((bundle) => bundle.id !== id));
-    message.success('Quiz Bundle Deleted');
+  const openModal = (bundle?: QuizBundle) => {
+    setIsModalVisible(true);
+    if (bundle) {
+      setEditingBundle(bundle);
+      form.setFieldsValue(bundle);
+    } else {
+      setEditingBundle(null);
+      form.resetFields();
+    }
   };
 
   const columns = [
@@ -92,8 +75,8 @@ const QuizBundlePage: React.FC = () => {
       title: 'Ngày tạo',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      width: 150,
-      render: (text: string) => new Date(text).toLocaleString(),
+      width: 100,
+      render: (date: Date) => date?.toLocaleString(),
     },
     {
       title: 'Tên gói',
@@ -137,94 +120,71 @@ const QuizBundlePage: React.FC = () => {
     },
     {
       title: 'Mô tả',
-      width: 300,
       dataIndex: 'description',
       key: 'description',
+      width: 300,
     },
     {
       title: '',
       key: 'actions',
       width: 100,
-      render: (_: any, record: QuizBundle) => (
-        <Space size="middle">
-          <Button onClick={() => handleEdit(record)} type="primary">
+      render: (_: any, bundle: QuizBundle) => (
+        <>
+          <Button type="link" onClick={() => openModal(bundle)}>
             Edit
           </Button>
-          <div>
-            <Button
-              color="danger"
-              variant="solid"
-              onClick={() => handleDelete(record.id)}
-            >
+          <Popconfirm
+            title="Are you sure you want to delete this quiz bundle?"
+            onConfirm={() => handleDelete(bundle.id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button type="link" danger>
               Delete
             </Button>
-
-            <Popconfirm
-              title="Are you sure you want to delete the quiz? This action cannot be undone."
-              open={confirmVisible === record.id}
-              onConfirm={() => handleDeleteConfirm(currentQuizBundleId ?? '')}
-              onCancel={handleDeleteCancel}
-              okText="Yes"
-              cancelText="No"
-            />
-          </div>
-        </Space>
+          </Popconfirm>
+        </>
       ),
     },
   ];
 
   return (
-    <div>
+    <>
       <h2>Các gói câu hỏi của bạn</h2>
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Card
-            extra={
-              <Space>
-                <Button type="primary" onClick={() => setIsModalVisible(true)}>
-                  Add Quiz Bundle
-                </Button>
-              </Space>
-            }
-          >
-            <Table dataSource={quizBundles} columns={columns} rowKey="id" />
-          </Card>
-        </Col>
-      </Row>
+      <Button
+        type="primary"
+        onClick={() => openModal()}
+        style={{ marginBottom: 16 }}
+      >
+        Add Quiz Bundle
+      </Button>
+      <Table
+        dataSource={quizBundles}
+        columns={columns}
+        rowKey="id"
+        pagination={{ pageSize: 8 }}
+      />
 
-      {/* Add/Edit Quiz Bundle Modal */}
       <Modal
-        title={currentQuizBundle ? 'Edit Quiz Bundle' : 'Add Quiz Bundle'}
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
-        footer={null}
+        onOk={editingBundle ? handleUpdate : handleAdd}
+        title={editingBundle ? 'Edit Quiz Bundle' : 'Add Quiz Bundle'}
       >
-        <Form
-          form={form}
-          onFinish={handleAddOrUpdate}
-          initialValues={{ name: currentQuizBundle?.name }}
-        >
+        <Form form={form} layout="vertical">
           <Form.Item
             name="name"
             label="Name"
-            rules={[
-              {
-                required: true,
-                message: 'Please input the name of the quiz bundle!',
-              },
-            ]}
+            rules={[{ required: true, message: 'Please enter a name' }]}
           >
             <Input />
           </Form.Item>
-
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              {currentQuizBundle ? 'Update' : 'Add'}
-            </Button>
+          <Form.Item name="description" label="Description">
+            <Input />
           </Form.Item>
         </Form>
       </Modal>
-    </div>
+    </>
   );
 };
 

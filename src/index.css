@@ -337,3 +337,8 @@ code {
   color: #fff;
   transform: scale(1.4);
 }
+
+/* Others */
+.scrollable-submenu::-webkit-scrollbar {
+  display: none; /* Hides the scrollbar */
+}

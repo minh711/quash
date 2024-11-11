@@ -98,8 +98,15 @@ const ProfilePage: React.FC = () => {
               />
             </div>
             <div style={{ textAlign: 'center' }}>
-              <h4>{user.name}</h4>
-              <p style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
+              <h2>{user.name}</h2>
+              <p
+                style={{
+                  wordWrap: 'break-word',
+                  wordBreak: 'break-word',
+                  fontSize: '24px',
+                  fontStyle: 'italic',
+                }}
+              >
                 {user.quote}
               </p>
               <Button

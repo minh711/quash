@@ -170,11 +170,18 @@ const QuizPage: React.FC = () => {
 
   return (
     <div>
-      <Button type="default" onClick={() => setIsCsvModalVisible(true)}>
-        Import CSV
-      </Button>
-
-      <h2>{quizBundle.name}</h2>
+      <div className="d-flex justify-content-between align-items-center">
+        <h2>{quizBundle.name}</h2>
+        <Button
+          color="danger"
+          size="large"
+          variant="solid"
+          className="breathe"
+          onClick={() => setIsCsvModalVisible(true)}
+        >
+          Import CSV
+        </Button>
+      </div>
       <p className="text-muted">{quizBundle.description}</p>
 
       <Collapse
@@ -184,8 +191,7 @@ const QuizPage: React.FC = () => {
         )}
       >
         <Panel header="Nhập câu hỏi mới" key="1">
-          <h2>Nhập câu hỏi mới</h2>
-
+          <h2 style={{ marginTop: 0 }}>Nhập câu hỏi mới</h2>
           <Row gutter={[16, 16]} align="stretch">
             {/* TextArea input section */}
             <Col
@@ -198,12 +204,6 @@ const QuizPage: React.FC = () => {
                 minHeight: '400px',
               }}
             >
-              <h3>Dán dữ liệu câu hỏi ở đây</h3>
-              <div className="mb-sm d-flex">
-                <Button type="primary" onClick={handleSubmit}>
-                  Submit
-                </Button>
-              </div>
               <Card>
                 <div>
                   <Input.TextArea
@@ -227,12 +227,6 @@ const QuizPage: React.FC = () => {
               }}
               className="quiz-component"
             >
-              <h3>Câu hỏi của bạn</h3>
-              <div className="mb-sm d-flex justify-content-end">
-                <Button type="primary" onClick={handleSubmit}>
-                  Submit
-                </Button>
-              </div>
               <Card>
                 {!quiz.question ? (
                   <div className="text-muted">
