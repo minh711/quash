@@ -31,9 +31,11 @@ export class QuizRepository {
     }
   }
 
-  importCsvData(csv: string, bundleId: string) {
+  importCsvData(csv: string, bundleId: string): number {
     const importedQuizzes = this.importQuiz.importCsv(csv, bundleId);
     importedQuizzes.forEach((quiz) => this.add(quiz));
+
+    return importedQuizzes.length;
   }
 
   add(quiz: Quiz) {

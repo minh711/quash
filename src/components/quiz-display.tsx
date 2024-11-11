@@ -12,6 +12,8 @@ interface QuizDisplayProps {
 }
 
 const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
+  const [showComponent, setShowComponent] = useState(true);
+
   const [quiz, setQuiz] = useState<Quiz>(() => {
     const quizRepository = DataSource.getInstance().quizRepository;
     const quiz = quizRepository.getById(quizId, quizBundleId)!;
@@ -143,11 +145,14 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
   const handleDeleteConfirm = () => {
     const quizRepository = DataSource.getInstance().quizRepository;
     quizRepository.delete(quiz.id, quiz.quizBundleId!);
+    setShowComponent(false);
   };
 
   const handleDelete = () => {
     setConfirmVisible(true);
   };
+
+  if (!showComponent) return null;
 
   return (
     <div>

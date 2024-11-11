@@ -173,8 +173,15 @@ const QuizPage: React.FC = () => {
 
     try {
       const quizRepository = DataSource.getInstance().quizRepository;
-      quizRepository.importCsvData(csvText, quizBundle.id);
-      message.success('CSV data successfully imported');
+      const importedQuizCount = quizRepository.importCsvData(
+        csvText,
+        quizBundle.id
+      );
+      if (importedQuizCount === 0) {
+        message.error('There was unknown error, check input format');
+      } else {
+        message.success('CSV data successfully imported');
+      }
       setIsCsvModalVisible(false);
       setCsvText('');
 
