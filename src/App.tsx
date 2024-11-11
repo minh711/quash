@@ -2,6 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import MainLayout from './layouts/main-layout';
 import QuizPage from './pages/quiz';
+import QuizBundlePage from './pages/quiz-bundle';
+import ProfilePage from './pages/profile';
+import HomePage from './pages/home';
 // import AppLayout from './layout/AppLayout';
 // import HomePage from './pages/HomePage';
 // import QuizzesPage from './pages/QuizzesPage';
@@ -11,9 +14,11 @@ const App: React.FC = () => (
   <Router>
     <MainLayout>
       <Routes>
-        {/* <Route path="/" element={<HomePage />} /> */}
-        <Route path="/quiz" element={<QuizPage />} />
-        {/* <Route path="/profile" element={<ProfilePage />} /> */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/quiz/:id" element={<QuizPage />} />
+        {/* <Route path="/quiz" element={<QuizPage />} /> */}
+        <Route path="/quiz-bundle" element={<QuizBundlePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </MainLayout>
   </Router>

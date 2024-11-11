@@ -1,23 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card, Col, Row, Button, Modal, Input, Popconfirm } from 'antd';
 import { Quiz, Answer } from '../entities/quiz';
 import RichTextEditor from './rich-text-editor';
 import { DataSource } from '../scripts/data-source';
 import { v4 as uuidv4 } from 'uuid';
-import ConfirmModal from './confirm-modal';
+import QuizChart from './quiz-chart';
 
 interface QuizDisplayProps {
   originQuiz: Quiz;
-  onDelete: (quizId: string) => void; // Callback to notify parent about deletion
+  onDelete: (quizId: string) => void;
+  onUpdate: (updatedQuiz: Quiz) => void;
 }
 
-const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
+const QuizDisplay: React.FC<QuizDisplayProps> = ({
+  originQuiz,
+  onDelete,
+  onUpdate,
+}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [quiz, setQuiz] = useState<Quiz>(originQuiz);
-  const [stateQuiz, setStateQuiz] = useState<Quiz>(quiz);
+  const [stateQuiz, setStateQuiz] = useState<Quiz>(originQuiz);
   const [confirmVisible, setConfirmVisible] = useState(false);
 
-  const quizTextarea = `${quiz.question
+  const originQuizTextarea = `${quiz.question
     .replace(/<strong>/g, '')
     .replace(/<\/strong>/g, '')
     .replace(/<\/?p>/g, '\n')}\n${quiz.answers
@@ -34,10 +39,21 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
     .replace(/\n\n(?!\n)/g, '\n')
     .replace(/\n{3,}/g, '\n\n');
 
+  const quizTextarea = originQuizTextarea;
+
   const [inputValue, setInputValue] = useState(quizTextarea);
 
+  const handleAnswerSelect = (id: string) => {
+    setStateQuiz((prevState) => ({
+      ...prevState,
+      correctAnswers: prevState.correctAnswers.includes(id)
+        ? prevState.correctAnswers.filter((item) => item !== id)
+        : [...prevState.correctAnswers, id],
+    }));
+  };
+
   const showModal = () => {
-    setStateQuiz(quiz); // Load the quiz content into the modal
+    setStateQuiz(quiz);
     setIsModalVisible(true);
   };
 
@@ -45,16 +61,14 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
     const questionContent = document
       .getElementById('question-editor')
       ?.querySelector('.ql-editor')?.innerHTML;
-
     const answers: Answer[] = [];
-    quiz.answers.forEach((_, index) => {
+    quiz.answers.forEach((item, index) => {
       const answerContent = document
         .getElementById(`answer-editor-${index}`)
         ?.querySelector('.ql-editor')?.innerHTML;
-
       if (answerContent) {
         const answer: Answer = {
-          id: uuidv4(),
+          id: item.id,
           content: answerContent,
         };
         answers.push(answer);
@@ -64,13 +78,22 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
     stateQuiz.question = questionContent ?? '';
     stateQuiz.answers = answers;
 
-    setQuiz(stateQuiz);
+    setQuiz({
+      ...quiz,
+      correctAnswers: stateQuiz.correctAnswers,
+    });
+
+    // setQuiz(stateQuiz);
     const quizRepository = DataSource.getInstance().quizRepository;
     quizRepository.update(stateQuiz);
+    console.log('Quiz', quiz);
+    console.log('Quiz answers', quiz.answers);
+    onUpdate(quiz);
     setIsModalVisible(false);
   };
 
   const handleCancel = () => {
+    setInputValue(originQuizTextarea);
     setIsModalVisible(false);
   };
 
@@ -105,8 +128,8 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
 
   const handleDeleteConfirm = () => {
     const quizRepository = DataSource.getInstance().quizRepository;
-    quizRepository.delete(quiz.id); // Delete the quiz from the repository
-    onDelete(quiz.id); // Notify parent about deletion
+    quizRepository.delete(quiz.id, quiz.quizBundleId!);
+    onDelete(quiz.id);
   };
 
   const handleDelete = () => {
@@ -133,7 +156,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
         </div>
 
         <Row gutter={[16, 16]}>
-          <Col span={16}>
+          <Col span={24} xs={24} md={16}>
             <Card className="quiz-component quiz-display">
               <div
                 className="quiz-item-card quiz-question"
@@ -141,9 +164,9 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
               ></div>
 
               <div style={{ marginTop: 24 }}>
-                {quiz.answers.map((answer: Answer, index: number) => (
+                {quiz.answers.map((answer: Answer) => (
                   <div
-                    className="quiz-item-card"
+                    className={`quiz-item-card quiz-answer ${quiz.correctAnswers.includes(answer.id) ? 'selected' : ''}`}
                     key={answer.id}
                     style={{ marginBottom: 8 }}
                     dangerouslySetInnerHTML={{ __html: answer.content }}
@@ -152,32 +175,37 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
               </div>
             </Card>
           </Col>
-          <Col span={8}>
-            <div className="d-flex">
-              <Button
-                type="primary"
-                onClick={showModal}
-                style={{ marginBottom: 8, marginRight: 8 }}
-              >
-                Chỉnh sửa
-              </Button>
-              <div>
-                <Button color="danger" variant="solid" onClick={handleDelete}>
-                  Xóa
-                </Button>
-
-                <Popconfirm
-                  title="Are you sure you want to delete the quiz? This action cannot be undone."
-                  open={confirmVisible}
-                  onConfirm={handleDeleteConfirm}
-                  onCancel={handleDeleteCancel}
-                  okText="Yes"
-                  cancelText="No"
+          <Col span={24} xs={0} md={8}>
+            <Card>
+              <div className="d-flex">
+                <Button
+                  type="primary"
+                  onClick={showModal}
+                  style={{ marginBottom: 8, marginRight: 8 }}
                 >
-                  <span />
-                </Popconfirm>
+                  Chỉnh sửa
+                </Button>
+                <div>
+                  <Button color="danger" variant="solid" onClick={handleDelete}>
+                    Xóa
+                  </Button>
+
+                  <Popconfirm
+                    title="Are you sure you want to delete the quiz? This action cannot be undone."
+                    open={confirmVisible}
+                    onConfirm={handleDeleteConfirm}
+                    onCancel={handleDeleteCancel}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <span />
+                  </Popconfirm>
+                </div>
               </div>
-            </div>
+              <div>
+                <QuizChart quiz={quiz}></QuizChart>
+              </div>
+            </Card>
           </Col>
         </Row>
 
@@ -256,9 +284,18 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ originQuiz, onDelete }) => {
                   <div style={{ marginTop: 24 }}>
                     {stateQuiz.answers.map((answer, idx) => (
                       <div
-                        className="quiz-item-card"
+                        className={`quiz-item-card quiz-answer ${
+                          stateQuiz.correctAnswers.includes(answer.id)
+                            ? 'selected'
+                            : ''
+                        }`}
                         key={idx}
-                        style={{ marginBottom: 8 }}
+                        style={{
+                          marginBottom: 8,
+                          cursor: 'pointer',
+                          transition: 'background-color 0.3s ease',
+                        }}
+                        onClick={() => handleAnswerSelect(answer.id)}
                       >
                         <RichTextEditor
                           id={`answer-editor-${idx}`}
