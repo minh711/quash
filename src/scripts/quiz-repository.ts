@@ -7,6 +7,83 @@ export class QuizRepository {
   constructor() {
     this.importQuiz = new ImportQuiz();
     this.migrateOldQuizzes();
+    this.migratePresetQuizzes();
+  }
+
+  private migratePresetQuizzes() {
+    if (
+      localStorage.getItem('preset-bundle-count') !== null ||
+      localStorage.getItem('preset-bundle-count') === '0'
+    ) {
+      return;
+    }
+
+    this.importCsvData(
+      `Thủ đô của Pháp là gì?
+A. Berlin
+B. Paris
+C. Madrid
+D. Rome,B;Ai là tác giả của "Romeo và Juliet"?
+A. Charles Dickens
+B. Leo Tolstoy
+C. William Shakespeare
+D. Mark Twain,C;Núi nào cao nhất thế giới?
+A. Kilimanjaro
+B. Everest
+C. Fuji
+D. Denali,B;Ai là nhà khoa học phát hiện ra thuyết tương đối?
+A. Isaac Newton
+B. Albert Einstein
+C. Nikola Tesla
+D. Galileo Galilei,B;Kim tự tháp nổi tiếng của Ai Cập là gì?
+A. Kim Tự Tháp Giza
+B. Kim Tự Tháp Angkor
+C. Kim Tự Tháp Machu Picchu
+D. Kim Tự Tháp Taj Mahal,A;Đơn vị tiền tệ của Nhật Bản là gì?
+A. Won
+B. Baht
+C. Yen
+D. Peso,C;Bức tranh "Mona Lisa" được vẽ bởi ai?
+A. Pablo Picasso
+B. Vincent van Gogh
+C. Leonardo da Vinci
+D. Claude Monet,C;Đại dương nào lớn nhất trên Trái Đất?
+A. Đại Tây Dương
+B. Ấn Độ Dương
+C. Thái Bình Dương
+D. Bắc Băng Dương,C;Ai phát minh ra bóng đèn?
+A. Thomas Edison
+B. Alexander Graham Bell
+C. Nikola Tesla
+D. Benjamin Franklin,A;Thành phố nào được gọi là "Big Apple"?
+A. Los Angeles
+B. New York
+C. San Francisco
+D. Chicago,B;Hành tinh nào được gọi là Hành tinh Đỏ?
+A. Sao Hỏa
+B. Sao Kim
+C. Sao Mộc
+D. Sao Thổ,A;Kí hiệu hóa học của nước là gì?
+A. O2
+B. H2O
+C. CO2
+D. NaCl,B;Loài vật nào được xem là "vua của rừng xanh"?
+A. Hổ
+B. Voi
+C. Sư tử
+D. Gấu,C;Bộ phim nào được lấy bối cảnh trên con tàu Titanic?
+A. Titanic
+B. Avatar
+C. Inception
+D. The Godfather,A;Người phát minh ra máy bay là ai?
+A. Nikola Tesla
+B. Wright Brothers
+C. Thomas Edison
+D. Alexander Bell,B;`,
+      'preset-bundle'
+    );
+
+    localStorage.setItem('preset-bundle-count', '15');
   }
 
   private migrateOldQuizzes() {
@@ -86,6 +163,35 @@ export class QuizRepository {
       quizzesForBundle[index] = { ...updatedQuiz, updatedAt: new Date() };
       this.updateLocalStorage(updatedQuiz.quizBundleId!, quizzesForBundle);
     }
+  }
+
+  getPracticeQuiz(
+    previousQuizIds: string[],
+    bundleId: string
+  ): Quiz | undefined {
+    const quizzesForBundle = this.getQuizzesForBundle(bundleId).filter(
+      (quiz) =>
+        !previousQuizIds.includes(quiz.id) && quiz.correctAnswers.length > 0 // Exclude quizzes with no correct answers
+    );
+
+    if (quizzesForBundle.length === 0) return undefined;
+
+    // Get top 5 quizzes with highest wrathCount
+    const topWrathQuizzes = [...quizzesForBundle]
+      .sort((a, b) => b.wrathCount - a.wrathCount)
+      .slice(0, 5);
+
+    // Get top 5 quizzes with lowest answeredCount
+    const topAnsweredQuizzes = [...quizzesForBundle]
+      .sort((a, b) => a.answeredCount - b.answeredCount)
+      .slice(0, 5);
+
+    // Combine both top lists
+    const combinedTopQuizzes = [...topWrathQuizzes, ...topAnsweredQuizzes];
+
+    // Get a random quiz from the combined list
+    const randomIndex = Math.floor(Math.random() * combinedTopQuizzes.length);
+    return combinedTopQuizzes[randomIndex];
   }
 
   private getQuizzesForBundle(bundleId: string): Quiz[] {

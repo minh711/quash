@@ -12,6 +12,7 @@ import {
 import { QuizBundle } from '../../entities/quiz';
 import { DataSource } from '../../scripts/data-source';
 import { Link } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 const QuizBundlePage: React.FC = () => {
   const [quizBundles, setQuizBundles] = useState<QuizBundle[]>([]);
@@ -29,7 +30,7 @@ const QuizBundlePage: React.FC = () => {
     form.validateFields().then((values) => {
       const newBundle = {
         ...values,
-        id: Math.random().toString(36).substr(2, 9),
+        id: uuidv4(),
         isPreset: false,
       };
       quizBundleRepository.add(newBundle);

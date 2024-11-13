@@ -5,6 +5,7 @@ import RichTextEditor from './rich-text-editor';
 import { DataSource } from '../scripts/data-source';
 import { v4 as uuidv4 } from 'uuid';
 import QuizChart from './quiz-chart';
+import EditQuizModal from './edit-quiz-modal';
 
 interface QuizDisplayProps {
   quizId: string;
@@ -154,6 +155,10 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
 
   if (!showComponent) return null;
 
+  const handleUpdateQuiz = (updatedQuiz: Quiz) => {
+    setQuiz(updatedQuiz);
+  };
+
   return (
     <div>
       <Card style={{ marginBottom: 16 }}>
@@ -186,7 +191,6 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
                   <div
                     className={`quiz-item-card quiz-answer ${quiz.correctAnswers.includes(answer.id) ? 'selected' : ''}`}
                     key={answer.id}
-                    style={{ marginBottom: 8 }}
                     dangerouslySetInnerHTML={{ __html: answer.content }}
                   ></div>
                 ))}
@@ -209,7 +213,19 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
                   </Button>
 
                   <Popconfirm
-                    title="Are you sure you want to delete the quiz? This action cannot be undone."
+                    title={
+                      <div
+                        style={{
+                          wordWrap: 'break-word',
+                          whiteSpace: 'normal',
+                          width: '300px',
+                        }}
+                      >
+                        Bạn có chắc muốn xóa câu hỏi này? Đây là hành động xóa
+                        câu hỏi hoàn toàn ra khỏi gói câu hỏi. Việc này không
+                        thể hoàn tác và câu hỏi sẽ mất vĩnh viễn.
+                      </div>
+                    }
                     open={confirmVisible}
                     onConfirm={handleDeleteConfirm}
                     onCancel={handleDeleteCancel}
@@ -227,107 +243,12 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
           </Col>
         </Row>
 
-        {/* Modal for editing quiz */}
-        <Modal
-          title="Chỉnh sửa câu hỏi"
-          open={isModalVisible}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          okText="Cập nhật"
-          cancelText="Hủy bỏ"
-          width={1200}
-          maskClosable={false}
-        >
-          <Row gutter={16} align="stretch">
-            {/* TextArea input section */}
-            <Col
-              xs={24}
-              sm={24}
-              md={12}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                minHeight: '400px',
-              }}
-            >
-              <h3>Dán dữ liệu câu hỏi ở đây</h3>
-              <Card bordered={false}>
-                <div>
-                  <Input.TextArea
-                    value={inputValue}
-                    onChange={handleInputChange}
-                    rows={24}
-                    placeholder="Type your question and answers here"
-                  />
-                </div>
-              </Card>
-            </Col>
-
-            {/* Display section */}
-            <Col
-              xs={24}
-              sm={24}
-              md={12}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-              className="quiz-component"
-            >
-              <h3>Câu hỏi của bạn</h3>
-              <Card>
-                {!quiz.question ? (
-                  <div className="text-muted">
-                    <p>Chưa có câu hỏi. Hãy nhập câu hỏi của bạn.</p>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="quiz-item-card quiz-question">
-                      <RichTextEditor
-                        id={`question-editor-${quiz.id}`}
-                        content={quiz.question}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* Show placeholder if there are no answers */}
-                {quiz.answers.length === 0 ? (
-                  <div className="text-muted">
-                    <p>
-                      Chưa có câu trả lời. Tách biệt câu hỏi và các câu trả lời
-                      bằng một dòng trống.
-                    </p>
-                  </div>
-                ) : (
-                  <div style={{ marginTop: 24 }}>
-                    {quiz.answers.map((answer, idx) => (
-                      <div
-                        className={`quiz-item-card quiz-answer ${
-                          quiz.correctAnswers.includes(answer.id)
-                            ? 'selected'
-                            : ''
-                        }`}
-                        key={idx}
-                        style={{
-                          marginBottom: 8,
-                          cursor: 'pointer',
-                          transition: 'background-color 0.3s ease',
-                        }}
-                        onClick={() => handleAnswerSelect(answer.id)}
-                      >
-                        <RichTextEditor
-                          id={`answer-editor-${quiz.id}-${idx}`}
-                          content={answer.content}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </Card>
-            </Col>
-          </Row>
-        </Modal>
+        <EditQuizModal
+          inputQuiz={quiz}
+          visible={isModalVisible}
+          onClose={() => setIsModalVisible(false)}
+          onUpdate={handleUpdateQuiz}
+        />
       </Card>
     </div>
   );

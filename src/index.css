@@ -306,11 +306,27 @@ code {
   right: -8px;
   animation: breathe 2s infinite;
 }
+.quiz-answer {
+  margin-bottom: 8px;
+}
 .quiz-item-card quiz-answer-edit quiz-answer:hover {
   background-color: #f0f0f0;
 }
 .quiz-answer.selected {
   background-color: var(--cyan-2);
+}
+.quiz-practice .quiz-answer.selected {
+  background-color: var(--volcano-2);
+}
+.quiz-practice.result .quiz-answer.correct {
+  background-color: var(--cyan-2);
+}
+.quiz-practice:not(.result):not(.hint) strong {
+  font-weight: inherit;
+}
+.quiz-practice:not(.result):not(.hint) strong::before {
+  background: none;
+  animation: none;
 }
 
 /* Quill */
@@ -345,4 +361,13 @@ code {
 /* Others */
 .scrollable-submenu::-webkit-scrollbar {
   display: none; /* Hides the scrollbar */
+}
+.btn-bubble {
+  width: 64px;
+  height: 64px;
+  text-wrap: wrap;
+  transition: border-radius 0.3s ease;
+}
+.btn-bubble:hover {
+  border-radius: 50%;
 }

@@ -11,7 +11,7 @@ export class ImportQuiz {
       const extracted = quizLines[i].split('\n');
       const len = extracted.length;
 
-      const question = extracted[0];
+      const question = '<p>' + extracted[0] + '</p>';
       const answers = [];
 
       for (let j = 1; j < len - 1; j++) {
@@ -73,6 +73,8 @@ export class ImportQuiz {
           .replace(/^[([]?[a-dA-D]{1}[)\]]?\.?\s*/i, '')
           .trim();
       }
+
+      processedContent = '<p>' + processedContent + '</p>';
 
       return { ...answer, content: processedContent };
     });

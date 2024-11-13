@@ -9,6 +9,7 @@ import {
   Modal,
   Form,
   Tour,
+  InputNumber,
 } from 'antd';
 import { Answer, Quiz, QuizBundle } from '../../entities/quiz';
 import RichTextEditor from '../../components/rich-text-editor';
@@ -16,7 +17,7 @@ import { DataSource } from '../../scripts/data-source';
 import { v4 as uuidv4 } from 'uuid';
 import QuizList from '../../components/quiz-list';
 import { message } from 'antd';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 
 const { Panel } = Collapse;
@@ -196,6 +197,16 @@ const QuizPage: React.FC = () => {
 
   const [open, setOpen] = useState(false);
 
+  const [numberOfQuestions, setNumberOfQuestions] = useState<number>(
+    Number(localStorage.getItem(`${quizBundleId}-count`)) > 50
+      ? 50
+      : Number(localStorage.getItem(`${quizBundleId}-count`))
+  );
+
+  const handleInputQuestionChange = (value: number | null) => {
+    setNumberOfQuestions(value ?? 1);
+  };
+
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center">
@@ -226,6 +237,101 @@ const QuizPage: React.FC = () => {
           Import CSV
         </Button>
       </div>
+      {Number(localStorage.getItem(`${quizBundleId}-count`)) > 0 && (
+        <div>
+          <Card title="Kiểm tra" style={{ marginBottom: 24 }}>
+            <div>
+              <Form>
+                <Form.Item label="Nhập số lượng câu hỏi">
+                  <InputNumber
+                    min={1}
+                    max={
+                      Number(localStorage.getItem(`${quizBundleId}-count`)) ??
+                      null
+                    }
+                    value={numberOfQuestions}
+                    onChange={handleInputQuestionChange}
+                  />
+                </Form.Item>
+              </Form>
+            </div>
+            <Card>
+              <h3>Chọn chế độ</h3>
+              <Row gutter={[16, 16]} justify="space-between">
+                <Col xs={24} sm={8} lg={8}>
+                  <Link to={`/practice/${quizBundleId}/1/${numberOfQuestions}`}>
+                    <Button
+                      type="primary"
+                      size="large"
+                      style={{
+                        backgroundColor: '#73d13d',
+                        width: 128,
+                        height: 128,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        margin: '0 auto',
+                        fontWeight: 'bold',
+                        fontSize: '1.6em',
+                      }}
+                      className="breathe"
+                    >
+                      DỄ
+                    </Button>
+                  </Link>
+                </Col>
+                <Col xs={24} sm={8} lg={8}>
+                  <Link to={`/practice/${quizBundleId}/2/${numberOfQuestions}`}>
+                    <Button
+                      type="primary"
+                      size="large"
+                      style={{
+                        backgroundColor: '#9254de',
+                        width: 128,
+                        height: 128,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        margin: '0 auto',
+                        fontWeight: 'bold',
+                        fontSize: '1.6em',
+                      }}
+                      className="breathe"
+                    >
+                      THƯỜNG
+                    </Button>
+                  </Link>
+                </Col>
+                <Col xs={24} sm={8} lg={8}>
+                  <Link to={`/practice/${quizBundleId}/3/${numberOfQuestions}`}>
+                    <Button
+                      style={{
+                        backgroundColor: '#610b00',
+                        width: 128,
+                        height: 128,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        margin: '0 auto',
+                        fontWeight: 'bold',
+                        fontSize: '1.6em',
+                      }}
+                      type="primary"
+                      size="large"
+                      className="breathe"
+                    >
+                      KHÓ
+                    </Button>
+                  </Link>
+                </Col>
+              </Row>
+            </Card>
+          </Card>
+        </div>
+      )}
 
       <Collapse
         ref={ref1}
@@ -328,11 +434,9 @@ const QuizPage: React.FC = () => {
           </Row>
         </Panel>
       </Collapse>
-
       <Row style={{ marginTop: 16 }}>
         <QuizList quizzes={quizzes} />
       </Row>
-
       {/* Import CSV Modal */}
       <Modal
         title="Import CSV Data"
@@ -359,7 +463,6 @@ const QuizPage: React.FC = () => {
           </Form.Item>
         </Form>
       </Modal>
-
       <Tour
         open={open}
         onClose={() => setOpen(false)}

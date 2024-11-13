@@ -10,7 +10,7 @@ export class QuizBundleRepository {
   }
 
   private initializePresetBundle() {
-    const presetId1 = 'preset-bundle-1';
+    const presetId1 = 'preset-bundle';
     const presetId2 = 'old-quizzes'; // New preset ID
 
     // Check if the first preset bundle exists
@@ -18,8 +18,9 @@ export class QuizBundleRepository {
       const veryPastDate = new Date(0); // January 1, 1970
       const presetBundle1: QuizBundle = {
         id: presetId1,
-        name: 'Preset Quiz Bundle',
-        description: 'This is a preset quiz bundle.',
+        name: 'Gói câu hỏi mẫu',
+        description:
+          'Bạn muốn thử nghiệm hệ thống? Hãy đến với gói câu hỏi có sẵn này.',
         createdAt: veryPastDate,
         updatedAt: veryPastDate,
         isPreset: true,
@@ -32,8 +33,9 @@ export class QuizBundleRepository {
       const veryPastDate = new Date(0); // January 1, 1970
       const presetBundle2: QuizBundle = {
         id: presetId2,
-        name: 'Old Quizzes Bundle',
-        description: 'This bundle contains old quizzes.',
+        name: 'Gói câu hỏi cũ',
+        description:
+          'Những câu hỏi từ phiên bản thử nghiệm của bạn sẽ được lưu ở đây.',
         createdAt: veryPastDate,
         updatedAt: veryPastDate,
         isPreset: true,

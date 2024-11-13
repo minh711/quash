@@ -207,7 +207,12 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           }}
         >
           <span
-            style={{ fontSize: '20px', color: 'white', marginLeft: '16px' }}
+            style={{
+              fontSize: '20px',
+              color: 'white',
+              marginLeft: '16px',
+              userSelect: 'none',
+            }}
           >
             Quash
           </span>

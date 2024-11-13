@@ -5,6 +5,7 @@ import QuizPage from './pages/quiz';
 import QuizBundlePage from './pages/quiz-bundle';
 import ProfilePage from './pages/profile';
 import HomePage from './pages/home';
+import PracticePage from './pages/practice';
 // import AppLayout from './layout/AppLayout';
 // import HomePage from './pages/HomePage';
 // import QuizzesPage from './pages/QuizzesPage';
@@ -16,8 +17,11 @@ const App: React.FC = () => (
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/quiz/:id" element={<QuizPage />} />
-        {/* <Route path="/quiz" element={<QuizPage />} /> */}
         <Route path="/quiz-bundle" element={<QuizBundlePage />} />
+        <Route
+          path="/practice/:id/:difficulty/:quizCount"
+          element={<PracticePage />}
+        />
         <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </MainLayout>

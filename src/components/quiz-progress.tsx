@@ -37,40 +37,37 @@ const QuizProgress: React.FC<QuizChartProps> = ({
           overflow: 'hidden',
         }}
       >
-        {/* Show gray bar if both counts are zero */}
         {isZeroAnswered ? (
           <div
             style={{
               width: '100%',
               height: '100%',
-              backgroundColor: '#b0b0b0', // Gray color
+              backgroundColor: '#b0b0b0',
             }}
           />
         ) : (
           <>
-            {/* Tooltip for Correct Answers */}
             <Tooltip
-              title={`${correctAnsweredCount} correct - ${correctPercentage.toFixed(2)}%`}
+              title={`${correctAnsweredCount} lần trả lời đúng - ${correctPercentage.toFixed(2)}%`}
             >
               <div
                 style={{
                   width: `${correctPercentage}%`,
                   height: '100%',
-                  backgroundColor: '#4caf50', // Green for correct answers
+                  backgroundColor: '#4caf50',
                   float: 'left',
                 }}
               />
             </Tooltip>
 
-            {/* Tooltip for Incorrect Answers */}
             <Tooltip
-              title={`${incorrectAnsweredCount} incorrect - ${incorrectPercentage.toFixed(2)}%`}
+              title={`${incorrectAnsweredCount} lần trả lời sai - ${incorrectPercentage.toFixed(2)}%`}
             >
               <div
                 style={{
                   width: `${incorrectPercentage}%`,
                   height: '100%',
-                  backgroundColor: '#f44336', // Red for incorrect answers
+                  backgroundColor: '#f44336',
                   float: 'left',
                 }}
               />
