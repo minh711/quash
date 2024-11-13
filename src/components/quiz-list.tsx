@@ -161,6 +161,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, quizBundleId }) => {
             <Option value="incorrectAnsweredCount_desc">Sai nhiều</Option>
             <Option value="correctAnswers_desc">Đúng nhiều</Option>
             <Option value="answeredCount_desc">Trả lời nhiều</Option>
+            <Option value="answeredCount_asc">Trả lời ít</Option>
           </Select>
 
           <Input
