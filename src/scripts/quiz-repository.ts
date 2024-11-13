@@ -128,17 +128,63 @@ D. Alexander Bell,B;`,
     return quizzesForBundle.find((quiz: any) => quiz.id === id);
   }
 
-  getByBundleId(bundleId: string, page = 1, pageSize = 10): Quiz[] {
+  private removeAccents(str: string): string {
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  getByBundleId(
+    bundleId: string,
+    page = 1,
+    pageSize = 10,
+    sortBy:
+      | 'createdAt'
+      | 'updatedAt'
+      | 'wrathCount'
+      | 'incorrectAnsweredCount'
+      | 'correctAnswers'
+      | 'answeredCount' = 'createdAt',
+    order: 'asc' | 'desc' = 'desc',
+    searchText = ''
+  ): Quiz[] {
     const quizzesForBundle = this.getQuizzesForBundle(bundleId);
 
+    // Remove accents and normalize search text
+    const normalizedSearchText = this.removeAccents(searchText.toLowerCase());
+
+    // Filter quizzes based on search text
+    const filteredQuizzes = quizzesForBundle.filter((quiz) => {
+      const normalizedQuestion = this.removeAccents(
+        quiz.question.toLowerCase()
+      );
+      const questionMatch = normalizedQuestion.includes(normalizedSearchText);
+
+      const answerMatch = quiz.answers.some((answer) =>
+        this.removeAccents(answer.content.toLowerCase()).includes(
+          normalizedSearchText
+        )
+      );
+
+      return questionMatch || answerMatch;
+    });
+
+    // Sort filtered quizzes based on sort criteria
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
 
-    return quizzesForBundle
-      .sort(
-        (a: any, b: any) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
+    return filteredQuizzes
+      .sort((a: any, b: any) => {
+        let comparison = 0;
+
+        if (sortBy === 'createdAt' || sortBy === 'updatedAt') {
+          const dateA = new Date(a[sortBy] || 0).getTime();
+          const dateB = new Date(b[sortBy] || 0).getTime();
+          comparison = dateA - dateB;
+        } else {
+          comparison = a[sortBy] - b[sortBy];
+        }
+
+        return order === 'asc' ? comparison : -comparison;
+      })
       .slice(startIndex, endIndex);
   }
 
