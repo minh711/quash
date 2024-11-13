@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import QuizPractice from '../../components/quiz-practice';
 import { DataSource } from '../../scripts/data-source';
 import { Card, Statistic, Progress, Row, Col, Button } from 'antd';
@@ -94,6 +94,12 @@ const PracticePage = () => {
         {quizBundle!.name}
       </h2>
 
+      <Link to={`/quiz/${quizBundleId}`}>
+        <Button type="primary" style={{ marginBottom: 8 }}>
+          Quay lại
+        </Button>
+      </Link>
+
       {/* Statistics and Progress Bar */}
       <Card title="Tiến trình" style={{ marginBottom: 16 }}>
         <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
@@ -105,7 +111,7 @@ const PracticePage = () => {
               />
             </Card>
           </Col>
-          {difficultyText !== '3' && (
+          {difficulty !== '3' && (
             <>
               <Col>
                 <Card>
@@ -136,7 +142,7 @@ const PracticePage = () => {
         </Row>
 
         <Progress
-          percent={(answered / quizCountNumber) * 100}
+          percent={Number(((answered / quizCountNumber) * 100).toFixed(2))}
           status="active"
           style={{ marginBottom: 16 }}
           strokeColor="#73d13d"
