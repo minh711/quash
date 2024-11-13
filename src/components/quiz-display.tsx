@@ -10,9 +10,14 @@ import EditQuizModal from './edit-quiz-modal';
 interface QuizDisplayProps {
   quizId: string;
   quizBundleId: string;
+  onDelete: (quizId: string) => void; // Passes quizId as string to parent
 }
 
-const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
+const QuizDisplay: React.FC<QuizDisplayProps> = ({
+  quizId,
+  quizBundleId,
+  onDelete,
+}) => {
   const [showComponent, setShowComponent] = useState(true);
 
   const [quiz, setQuiz] = useState<Quiz>(() => {
@@ -44,17 +49,6 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
 
   const quizTextarea = originQuizTextarea;
 
-  const [inputValue, setInputValue] = useState(quizTextarea);
-
-  const handleAnswerSelect = (id: string) => {
-    setQuiz((prevState) => ({
-      ...prevState,
-      correctAnswers: prevState.correctAnswers.includes(id)
-        ? prevState.correctAnswers.filter((item) => item !== id)
-        : [...prevState.correctAnswers, id],
-    }));
-  };
-
   const showModal = () => {
     const quizRepository = DataSource.getInstance().quizRepository;
     const originQuiz = quizRepository.getById(quizId, quizBundleId)!;
@@ -62,91 +56,15 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({ quizId, quizBundleId }) => {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
-    const questionContent = document
-      .getElementById(`question-editor-${quiz.id}`)
-      ?.querySelector('.ql-editor')?.innerHTML;
-    const answers: Answer[] = [];
-    quiz.answers.forEach((item, index) => {
-      const answerContent = document
-        .getElementById(`answer-editor-${quiz.id}-${index}`)
-        ?.querySelector('.ql-editor')?.innerHTML;
-      if (answerContent) {
-        const answer: Answer = {
-          id: item.id,
-          content: answerContent,
-        };
-        answers.push(answer);
-      }
-    });
-
-    console.log('Update', questionContent);
-    console.log('Update', answers);
-
-    setQuiz({
-      ...quiz,
-      question: questionContent ?? '',
-      answers: answers,
-      correctAnswers: quiz.correctAnswers,
-    });
-
-    setQuiz(quiz);
-
-    const quizRepository = DataSource.getInstance().quizRepository;
-    quizRepository.update({
-      ...quiz,
-      question: questionContent ?? '',
-      answers: answers,
-      correctAnswers: quiz.correctAnswers,
-    });
-
-    const originQuiz = quizRepository.getById(quizId, quizBundleId)!;
-    setQuiz(originQuiz);
-
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    const quizRepository = DataSource.getInstance().quizRepository;
-    const originQuiz = quizRepository.getById(quizId, quizBundleId)!;
-    setQuiz(originQuiz);
-    setInputValue(originQuizTextarea);
-    setIsModalVisible(false);
-  };
-
   const handleDeleteCancel = () => {
     setConfirmVisible(false);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
-    const parts = value.trim().split(/\n{2,}/);
-    if (parts.length > 0) {
-      const question = parts[0]
-        .split('\n')
-        .map((line) => `<p>${line}</p>`)
-        .join('');
-      const answers = parts.slice(1).map((answer) => ({
-        id: uuidv4(),
-        content: answer
-          .split('\n')
-          .map((line) => `<p>${line}</p>`)
-          .join(''),
-      }));
-
-      setQuiz({
-        ...quiz,
-        question,
-        answers: answers,
-      });
-    }
   };
 
   const handleDeleteConfirm = () => {
     const quizRepository = DataSource.getInstance().quizRepository;
     quizRepository.delete(quiz.id, quiz.quizBundleId!);
     setShowComponent(false);
+    onDelete(quiz.id);
   };
 
   const handleDelete = () => {

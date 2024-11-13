@@ -12,9 +12,14 @@ interface QuizListProps {
 
 const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
   const [quizList, setQuizList] = useState<Quiz[]>(quizzes);
-  const [quizCount, setQuizCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [quizBundleId, setQuizBundleId] = useState<string | null>(null);
+  const [quizBundleId, setQuizBundleId] = useState<string | null>(() => {
+    return quizzes[0].quizBundleId ?? null;
+  });
+  const [quizCount, setQuizCount] = useState<number>(() => {
+    const count = Number(localStorage.getItem(`${quizBundleId}-count`) || '0');
+    return count;
+  });
 
   // const pageSize = 10;
 
@@ -28,7 +33,6 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
   >(null);
   const [order, setOrder] = useState<'asc' | 'desc'>('desc');
   const [searchText, setSearchText] = useState<string>('');
-  const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [isFilter, setIsFilter] = useState(false);
 
@@ -47,7 +51,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
-    setPage(1); // Reset to first page on search change
+    setCurrentPage(1);
   };
 
   const handleSearchAndSort = () => {
@@ -81,6 +85,9 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
     if (!quizBundleId) {
       setQuizBundleId(quizzes[0].quizBundleId!);
     }
+
+    const count = Number(localStorage.getItem(`${quizBundleId}-count`) || '0');
+    setQuizCount(count);
   }, [quizzes]);
 
   useEffect(() => {
@@ -88,7 +95,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
       setQuizBundleId(quizzes[0].quizBundleId!);
     }
 
-    if (quizList && quizList.length > 0) {
+    if ((quizList && quizList.length > 0) || quizzes.length > 0) {
       const count = Number(
         localStorage.getItem(`${quizBundleId}-count`) || '0'
       );
@@ -114,6 +121,12 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
     );
     setQuizList((prevQuizzes) => [...prevQuizzes, ...newQuizzes]);
     setCurrentPage(nextPage);
+  };
+
+  const handleDelete = (quizId: string) => {
+    setQuizList(quizList.filter((quiz) => quiz.id !== quizId));
+
+    setQuizCount((prevCount) => prevCount - 1);
   };
 
   return (
@@ -195,6 +208,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
             key={quiz.id}
             quizId={quiz.id}
             quizBundleId={quiz.quizBundleId!}
+            onDelete={handleDelete}
           />
         ))}
 
