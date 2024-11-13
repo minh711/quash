@@ -37,6 +37,7 @@ const QuizPage: React.FC = () => {
   ];
 
   const { id } = useParams();
+  console.log(id);
   const quizBundleId = id;
 
   const [inputValue, setInputValue] = useState('');
@@ -472,7 +473,7 @@ const QuizPage: React.FC = () => {
       </Collapse>
 
       <Row style={{ marginTop: 16 }}>
-        <QuizList quizzes={quizzes} />
+        <QuizList quizzes={quizzes} quizBundleId={quizBundleId!} />
       </Row>
       {/* Import CSV Modal */}
       <Modal

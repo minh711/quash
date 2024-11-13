@@ -8,14 +8,12 @@ const { Option } = Select;
 
 interface QuizListProps {
   quizzes: Quiz[];
+  quizBundleId: string;
 }
 
-const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
+const QuizList: React.FC<QuizListProps> = ({ quizzes, quizBundleId }) => {
   const [quizList, setQuizList] = useState<Quiz[]>(quizzes);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [quizBundleId, setQuizBundleId] = useState<string | null>(() => {
-    return quizzes[0].quizBundleId ?? null;
-  });
   const [quizCount, setQuizCount] = useState<number>(() => {
     const count = Number(localStorage.getItem(`${quizBundleId}-count`) || '0');
     return count;
@@ -82,19 +80,11 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
     setQuizList(quizzes);
     setIsFilter(false);
 
-    if (!quizBundleId) {
-      setQuizBundleId(quizzes[0].quizBundleId!);
-    }
-
     const count = Number(localStorage.getItem(`${quizBundleId}-count`) || '0');
     setQuizCount(count);
   }, [quizzes]);
 
   useEffect(() => {
-    if (!quizBundleId) {
-      setQuizBundleId(quizzes[0].quizBundleId!);
-    }
-
     if ((quizList && quizList.length > 0) || quizzes.length > 0) {
       const count = Number(
         localStorage.getItem(`${quizBundleId}-count`) || '0'
