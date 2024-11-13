@@ -10,6 +10,7 @@ import {
   Form,
   Tour,
   InputNumber,
+  Tooltip,
 } from 'antd';
 import { Answer, Quiz, QuizBundle } from '../../entities/quiz';
 import RichTextEditor from '../../components/rich-text-editor';
@@ -259,73 +260,85 @@ const QuizPage: React.FC = () => {
               <h3>Chọn chế độ</h3>
               <Row gutter={[16, 16]} justify="space-between">
                 <Col xs={24} sm={8} lg={8}>
-                  <Link to={`/practice/${quizBundleId}/1/${numberOfQuestions}`}>
-                    <Button
-                      type="primary"
-                      size="large"
-                      style={{
-                        backgroundColor: '#73d13d',
-                        width: 128,
-                        height: 128,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        margin: '0 auto',
-                        fontWeight: 'bold',
-                        fontSize: '1.6em',
-                      }}
-                      className="breathe"
+                  <Tooltip title="Cho phép bạn thoải mái xem Gợi ý cũng như chỉnh sửa câu hỏi trong lúc làm">
+                    <Link
+                      to={`/practice/${quizBundleId}/1/${numberOfQuestions}`}
                     >
-                      DỄ
-                    </Button>
-                  </Link>
+                      <Button
+                        type="primary"
+                        size="large"
+                        style={{
+                          backgroundColor: '#73d13d',
+                          width: 128,
+                          height: 128,
+                          borderRadius: '50%',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          margin: '0 auto',
+                          fontWeight: 'bold',
+                          fontSize: '1.6em',
+                        }}
+                        className="breathe"
+                      >
+                        DỄ
+                      </Button>
+                    </Link>
+                  </Tooltip>
                 </Col>
                 <Col xs={24} sm={8} lg={8}>
-                  <Link to={`/practice/${quizBundleId}/2/${numberOfQuestions}`}>
-                    <Button
-                      type="primary"
-                      size="large"
-                      style={{
-                        backgroundColor: '#9254de',
-                        width: 128,
-                        height: 128,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        margin: '0 auto',
-                        fontWeight: 'bold',
-                        fontSize: '1.6em',
-                      }}
-                      className="breathe"
+                  <Tooltip title="Bạn vẫn có thể biết được đáp án khi làm xong">
+                    <Link
+                      to={`/practice/${quizBundleId}/2/${numberOfQuestions}`}
                     >
-                      THƯỜNG
-                    </Button>
-                  </Link>
+                      <Button
+                        type="primary"
+                        size="large"
+                        style={{
+                          backgroundColor: '#9254de',
+                          width: 128,
+                          height: 128,
+                          borderRadius: '50%',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          margin: '0 auto',
+                          fontWeight: 'bold',
+                          fontSize: '1.6em',
+                        }}
+                        className="breathe"
+                      >
+                        THƯỜNG
+                      </Button>
+                    </Link>
+                  </Tooltip>
                 </Col>
                 <Col xs={24} sm={8} lg={8}>
-                  <Link to={`/practice/${quizBundleId}/3/${numberOfQuestions}`}>
-                    <Button
-                      style={{
-                        backgroundColor: '#610b00',
-                        width: 128,
-                        height: 128,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        margin: '0 auto',
-                        fontWeight: 'bold',
-                        fontSize: '1.6em',
-                      }}
-                      type="primary"
-                      size="large"
-                      className="breathe"
+                  <Tooltip title="Đáp án không được hiển thị ở chế độ này">
+                    <Link
+                      to={`/practice/${quizBundleId}/3/${numberOfQuestions}`}
                     >
-                      KHÓ
-                    </Button>
-                  </Link>
+                      <Button
+                        style={{
+                          backgroundColor: '#610b00',
+                          width: 128,
+                          height: 128,
+                          borderRadius: '50%',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          margin: '0 auto',
+                          fontWeight: 'bold',
+                          fontSize: '1.6em',
+                        }}
+                        type="primary"
+                        size="large"
+                        className="breathe"
+                      >
+                        KHÓ
+                      </Button>
+                    </Link>
+                  </Tooltip>
                 </Col>
               </Row>
             </Card>
