@@ -37,9 +37,27 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
     if (updatedQuiz && updatedQuiz !== quiz) {
       setQuiz(updatedQuiz);
     }
-  }, [inputQuiz, quiz]);
+  }, [inputQuiz]);
 
-  const [originQuizTextarea, setOriginQuizTextarea] = useState('');
+  const [originQuizTextarea, setOriginQuizTextarea] = useState(() => {
+    const formattedText = `${quiz.question
+      .replace(/<strong>/g, '')
+      .replace(/<\/strong>/g, '')
+      .replace(/<\/?p>/g, '\n')}\n${quiz.answers
+      .map((item) => {
+        const content = item.content
+          .replace(/<strong>/g, '')
+          .replace(/<\/strong>/g, '')
+          .replace(/<\/?p>/g, '\n');
+        return content;
+      })
+      .join('\n')}`
+      .replace(/^\n+|\n+$/g, '')
+      .replace(/\n\n(?!\n)/g, '\n')
+      .replace(/\n{3,}/g, '\n\n');
+
+    return formattedText;
+  });
 
   useEffect(() => {
     const formattedText = `${quiz.question
