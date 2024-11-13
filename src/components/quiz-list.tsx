@@ -122,7 +122,7 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes }) => {
         {!isFilter && (
           <h3>
             Danh sách câu hỏi của bạn
-            {quizCount !== 0 ? (
+            {quizList.length !== 0 ? (
               <span className="text-muted">
                 {' '}
                 (hiển thị {Math.min(currentPage * pageSize, quizCount)}/
