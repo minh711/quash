@@ -4,8 +4,9 @@ import QuizPractice from '../../components/quiz-practice';
 import { DataSource } from '../../scripts/data-source';
 import { Card, Statistic, Progress, Row, Col, Button } from 'antd';
 import { User } from '../../entities/user';
-import { Quiz } from '../../entities/quiz';
+import { Quiz, QuizHistory } from '../../entities/quiz';
 import ResultModal from '../../components/result-modal';
+import { v4 as uuidv4 } from 'uuid';
 
 const PracticePage = () => {
   const { id, difficulty, quizCount } = useParams();
@@ -57,6 +58,22 @@ const PracticePage = () => {
 
   const handleNextQuiz = () => {
     if (answered === quizCountNumber) {
+      const currentHistory = JSON.parse(
+        localStorage.getItem(`${quizBundleId}-history`) || '[]'
+      );
+      const newHistory: QuizHistory = {
+        id: uuidv4(),
+        answeredCount: Number(quizCount),
+        correctAnsweredCount: correct,
+        incorrectAnsweredCount: incorrect,
+        createdAt: new Date(),
+      };
+      currentHistory.unshift(newHistory);
+      localStorage.setItem(
+        `${quizBundleId}-history`,
+        JSON.stringify(currentHistory)
+      );
+
       setResultModalVisible(true);
       return;
     }

@@ -37,3 +37,11 @@ export interface QuizBundle {
   updatedAt?: Date;
   isPreset: boolean;
 }
+
+export interface QuizHistory {
+  id: string;
+  createdAt: Date;
+  answeredCount: number;
+  correctAnsweredCount: number;
+  incorrectAnsweredCount: number;
+}

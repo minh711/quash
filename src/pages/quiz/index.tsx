@@ -14,7 +14,7 @@ import {
   Menu,
   Select,
 } from 'antd';
-import { Answer, Quiz, QuizBundle } from '../../entities/quiz';
+import { Answer, Quiz, QuizBundle, QuizHistory } from '../../entities/quiz';
 import RichTextEditor from '../../components/rich-text-editor';
 import { DataSource } from '../../scripts/data-source';
 import { v4 as uuidv4 } from 'uuid';
@@ -22,6 +22,7 @@ import QuizList from '../../components/quiz-list';
 import { message } from 'antd';
 import { Link, useParams } from 'react-router-dom';
 import { CaretRightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import QuizHistoryChart from '../../components/quiz-history-chart';
 
 const { Panel } = Collapse;
 
@@ -52,18 +53,19 @@ const QuizPage: React.FC = () => {
     wrathCount: 0,
     quizBundleId: quizBundleId,
   });
-
   const [quizBundle, setQuizBundle] = useState<QuizBundle>(() => {
     const quizBundleRepository = DataSource.getInstance().quizBundleRepository;
     return quizBundleRepository.getById(quizBundleId!)!;
   });
-
   const [quizzes, setQuizzes] = useState<Quiz[]>(() => {
     const quizRepository = DataSource.getInstance().quizRepository;
     return quizRepository.getByBundleId(quizBundleId!);
   });
-
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+  const [quizHistory, setQuizHistory] = useState<QuizHistory[]>(() => {
+    const storedHistory = localStorage.getItem(`${quizBundleId}-history`);
+    return storedHistory ? JSON.parse(storedHistory) : [];
+  });
 
   const handleAnswerSelect = (id: string) => {
     setSelectedAnswers((prevSelected) =>
@@ -243,107 +245,126 @@ const QuizPage: React.FC = () => {
       {Number(localStorage.getItem(`${quizBundleId}-count`)) > 0 && (
         <div>
           <Card title="Kiểm tra" style={{ marginBottom: 24 }}>
-            <div>
-              <Form>
-                <Form.Item label="Nhập số lượng câu hỏi">
-                  <InputNumber
-                    min={1}
-                    max={
-                      Number(localStorage.getItem(`${quizBundleId}-count`)) ??
-                      null
-                    }
-                    value={numberOfQuestions}
-                    onChange={handleInputQuestionChange}
-                  />
-                </Form.Item>
-              </Form>
-            </div>
-            <Card>
-              <h3>Chọn chế độ</h3>
-              <Row gutter={[16, 16]} justify="space-between">
-                <Col xs={24} sm={8} lg={8}>
-                  <Tooltip title="Cho phép bạn thoải mái xem Gợi ý cũng như chỉnh sửa câu hỏi trong lúc làm">
-                    <Link
-                      to={`/practice/${quizBundleId}/1/${numberOfQuestions}`}
-                    >
-                      <Button
-                        type="primary"
-                        size="large"
-                        style={{
-                          backgroundColor: '#73d13d',
-                          width: 128,
-                          height: 128,
-                          borderRadius: '50%',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          margin: '0 auto',
-                          fontWeight: 'bold',
-                          fontSize: '1.6em',
-                        }}
-                        className="breathe"
+            <Row gutter={[16, 16]}>
+              <Col lg={12} md={24} xs={24}>
+                <Card style={{ width: '100%', height: '100%' }}>
+                  <div>
+                    <Form>
+                      <Form.Item label="Nhập số lượng câu hỏi">
+                        <InputNumber
+                          min={1}
+                          max={
+                            Number(
+                              localStorage.getItem(`${quizBundleId}-count`)
+                            ) ?? null
+                          }
+                          value={numberOfQuestions}
+                          onChange={handleInputQuestionChange}
+                        />
+                      </Form.Item>
+                    </Form>
+                  </div>
+                  <div style={{ paddingBottom: 24 }}>
+                    <h3>Chọn chế độ</h3>
+                    <Card>
+                      <Row
+                        gutter={[16, 16]}
+                        justify="space-between"
+                        style={{ marginTop: 48, marginBottom: 48 }}
                       >
-                        DỄ
-                      </Button>
-                    </Link>
-                  </Tooltip>
-                </Col>
-                <Col xs={24} sm={8} lg={8}>
-                  <Tooltip title="Bạn vẫn có thể biết được đáp án khi làm xong">
-                    <Link
-                      to={`/practice/${quizBundleId}/2/${numberOfQuestions}`}
-                    >
-                      <Button
-                        type="primary"
-                        size="large"
-                        style={{
-                          backgroundColor: '#9254de',
-                          width: 128,
-                          height: 128,
-                          borderRadius: '50%',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          margin: '0 auto',
-                          fontWeight: 'bold',
-                          fontSize: '1.6em',
-                        }}
-                        className="breathe"
-                      >
-                        THƯỜNG
-                      </Button>
-                    </Link>
-                  </Tooltip>
-                </Col>
-                <Col xs={24} sm={8} lg={8}>
-                  <Tooltip title="Đáp án không được hiển thị ở chế độ này">
-                    <Link
-                      to={`/practice/${quizBundleId}/3/${numberOfQuestions}`}
-                    >
-                      <Button
-                        style={{
-                          backgroundColor: '#610b00',
-                          width: 128,
-                          height: 128,
-                          borderRadius: '50%',
-                          display: 'flex',
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          margin: '0 auto',
-                          fontWeight: 'bold',
-                          fontSize: '1.6em',
-                        }}
-                        type="primary"
-                        size="large"
-                        className="breathe"
-                      >
-                        KHÓ
-                      </Button>
-                    </Link>
-                  </Tooltip>
-                </Col>
-              </Row>
-            </Card>
+                        <Col xs={24} sm={8} lg={8}>
+                          <Tooltip title="Cho phép bạn thoải mái xem Gợi ý cũng như chỉnh sửa câu hỏi trong lúc làm">
+                            <Link
+                              to={`/practice/${quizBundleId}/1/${numberOfQuestions}`}
+                            >
+                              <Button
+                                type="primary"
+                                size="large"
+                                style={{
+                                  backgroundColor: '#73d13d',
+                                  width: 128,
+                                  height: 128,
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  margin: '0 auto',
+                                  fontWeight: 'bold',
+                                  fontSize: '1.6em',
+                                }}
+                                className="breathe"
+                              >
+                                DỄ
+                              </Button>
+                            </Link>
+                          </Tooltip>
+                        </Col>
+                        <Col xs={24} sm={8} lg={8}>
+                          <Tooltip title="Bạn vẫn có thể biết được đáp án khi làm xong">
+                            <Link
+                              to={`/practice/${quizBundleId}/2/${numberOfQuestions}`}
+                            >
+                              <Button
+                                type="primary"
+                                size="large"
+                                style={{
+                                  backgroundColor: '#9254de',
+                                  width: 128,
+                                  height: 128,
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  margin: '0 auto',
+                                  fontWeight: 'bold',
+                                  fontSize: '1.6em',
+                                }}
+                                className="breathe"
+                              >
+                                THƯỜNG
+                              </Button>
+                            </Link>
+                          </Tooltip>
+                        </Col>
+                        <Col xs={24} sm={8} lg={8}>
+                          <Tooltip title="Đáp án không được hiển thị ở chế độ này">
+                            <Link
+                              to={`/practice/${quizBundleId}/3/${numberOfQuestions}`}
+                            >
+                              <Button
+                                style={{
+                                  backgroundColor: '#610b00',
+                                  width: 128,
+                                  height: 128,
+                                  borderRadius: '50%',
+                                  display: 'flex',
+                                  justifyContent: 'center',
+                                  alignItems: 'center',
+                                  margin: '0 auto',
+                                  fontWeight: 'bold',
+                                  fontSize: '1.6em',
+                                }}
+                                type="primary"
+                                size="large"
+                                className="breathe"
+                              >
+                                KHÓ
+                              </Button>
+                            </Link>
+                          </Tooltip>
+                        </Col>
+                      </Row>
+                    </Card>
+                  </div>
+                </Card>
+              </Col>
+              <Col lg={12} md={24} xs={24}>
+                <Card>
+                  <h3>Thống kê</h3>
+                  <QuizHistoryChart data={quizHistory} />
+                </Card>
+              </Col>
+            </Row>
           </Card>
         </div>
       )}
