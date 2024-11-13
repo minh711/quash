@@ -154,8 +154,8 @@ const QuizList: React.FC<QuizListProps> = ({ quizzes, quizBundleId }) => {
             style={{ width: 200, marginRight: 8 }}
             placeholder="Lọc theo"
           >
-            <Option value="createdAt_asc">Mới nhất</Option>
-            <Option value="createdAt_desc">Cũ nhất</Option>
+            <Option value="createdAt_desc">Mới nhất</Option>
+            <Option value="createdAt_asc">Cũ nhất</Option>
             <Option value="updatedAt_desc">Cập nhật gần nhất</Option>
             <Option value="wrathCount_desc">Điểm phẫn nộ</Option>
             <Option value="incorrectAnsweredCount_desc">Sai nhiều</Option>
