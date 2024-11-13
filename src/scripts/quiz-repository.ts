@@ -153,15 +153,17 @@ D. Alexander Bell,B;`,
 
     // Filter quizzes based on search text
     const filteredQuizzes = quizzesForBundle.filter((quiz) => {
+      const removeHtmlTags = (text: string) => text.replace(/<[^>]*>/g, '');
+
       const normalizedQuestion = this.removeAccents(
-        quiz.question.toLowerCase()
+        removeHtmlTags(quiz.question.toLowerCase())
       );
       const questionMatch = normalizedQuestion.includes(normalizedSearchText);
 
       const answerMatch = quiz.answers.some((answer) =>
-        this.removeAccents(answer.content.toLowerCase()).includes(
-          normalizedSearchText
-        )
+        this.removeAccents(
+          removeHtmlTags(answer.content.toLowerCase())
+        ).includes(normalizedSearchText)
       );
 
       return questionMatch || answerMatch;
