@@ -180,14 +180,30 @@ const QuizPage: React.FC = () => {
 
     try {
       const quizRepository = DataSource.getInstance().quizRepository;
-      const importedQuizCount = quizRepository.importCsvData(
-        csvText,
-        quizBundle.id
-      );
-      if (importedQuizCount === 0) {
-        message.error('There was unknown error, check input format');
+      let importedQuizCount = 0;
+
+      if (csvText.trim().startsWith('[{')) {
+        const jsonData = JSON.parse(csvText.trim());
+        jsonData.forEach((item: Quiz) => {
+          item.quizBundleId = quizBundle.id;
+        });
+        localStorage.setItem(quizBundle.id, JSON.stringify(jsonData));
+        importedQuizCount = jsonData.length;
+        localStorage.setItem(
+          `${quizBundle.id}-count`,
+          importedQuizCount.toString()
+        );
       } else {
-        message.success('CSV data successfully imported');
+        importedQuizCount = quizRepository.importCsvData(
+          csvText,
+          quizBundle.id
+        );
+      }
+
+      if (importedQuizCount === 0) {
+        message.error('Có lỗi xảy ra, kiểm tra lại dữ liệu đầu vào');
+      } else {
+        message.success('Nhập dữ liệu thành công');
       }
       setIsCsvModalVisible(false);
       setCsvText('');
@@ -240,7 +256,7 @@ const QuizPage: React.FC = () => {
           className="breathe"
           onClick={() => setIsCsvModalVisible(true)}
         >
-          Import CSV
+          Tải câu hỏi lên
         </Button>
       </div>
       {Number(localStorage.getItem(`${quizBundleId}-count`)) > 0 && (
@@ -477,13 +493,13 @@ const QuizPage: React.FC = () => {
       </Row>
       {/* Import CSV Modal */}
       <Modal
-        title="Import CSV Data"
+        title="Tải câu hỏi lên"
         open={isCsvModalVisible}
         onCancel={() => setIsCsvModalVisible(false)}
         footer={null}
       >
-        <Form>
-          <Form.Item label="Paste CSV" required>
+        <Form layout="vertical">
+          <Form.Item label="Dán dữ liệu CSV hoặc JSON vào đây" required>
             <Input.TextArea
               rows={6}
               value={csvText}
@@ -491,13 +507,15 @@ const QuizPage: React.FC = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleImportCsv}
-              disabled={!csvText}
-            >
-              Import
-            </Button>
+            <Tooltip title="Nếu dữ liệu quá nhiều, quá trình sẽ tốn thời gian giây lát, vui lòng kiên nhẫn đợi cho đến khi xong hoàn toàn">
+              <Button
+                type="primary"
+                onClick={handleImportCsv}
+                disabled={!csvText}
+              >
+                Bắt đầu nhập dữ liệu
+              </Button>
+            </Tooltip>
           </Form.Item>
         </Form>
       </Modal>
