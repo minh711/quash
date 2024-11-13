@@ -58,6 +58,7 @@ const QuizPractice: React.FC<QuizDisplayProps> = ({
     setQuiz(fetchedQuiz!);
     setIsChecked(false);
     setIsGotHint(false);
+    setIsHint(false);
   }, [quizId, quizBundleId]);
 
   const handleDeleteConfirm = () => {
@@ -74,6 +75,7 @@ const QuizPractice: React.FC<QuizDisplayProps> = ({
     setQuiz(updatedQuiz);
     setIsChecked(false);
     setIsGotHint(false);
+    setIsHint(false);
   };
 
   const handleAnswerSelect = (id: string) => {
@@ -142,6 +144,7 @@ const QuizPractice: React.FC<QuizDisplayProps> = ({
 
     setIsChecked(true);
     setIsGotHint(false);
+    setIsHint(false);
     onAnswerChecked(isAnswerCorrect);
   };
 

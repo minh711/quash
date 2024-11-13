@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Card, Col, Row, Input } from 'antd';
 import { Quiz, Answer } from '../entities/quiz';
 import RichTextEditor from './rich-text-editor';
@@ -26,6 +26,18 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
     )!;
     return quiz;
   });
+
+  useEffect(() => {
+    const quizRepository = DataSource.getInstance().quizRepository;
+    const updatedQuiz = quizRepository.getById(
+      inputQuiz.id,
+      inputQuiz.quizBundleId ?? ''
+    );
+
+    if (updatedQuiz && updatedQuiz !== quiz) {
+      setQuiz(updatedQuiz);
+    }
+  }, [inputQuiz, quiz]);
 
   const originQuizTextarea = `${quiz.question
     .replace(/<strong>/g, '')
@@ -150,6 +162,7 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
       onCancel={handleCancel}
       okText="Cập nhật"
       cancelText="Hủy bỏ"
+      closable={false}
       width={1200}
       maskClosable={false}
     >
