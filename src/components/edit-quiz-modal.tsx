@@ -39,22 +39,27 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
     }
   }, [inputQuiz, quiz]);
 
-  const originQuizTextarea = `${quiz.question
-    .replace(/<strong>/g, '')
-    .replace(/<\/strong>/g, '')
-    .replace(/<\/?p>/g, '\n')}\n${quiz.answers
-    .map((item) => {
-      const content = item.content
-        .replace(/<strong>/g, '')
-        .replace(/<\/strong>/g, '')
-        .replace(/<\/?p>/g, '\n');
+  const [originQuizTextarea, setOriginQuizTextarea] = useState('');
 
-      return content;
-    })
-    .join('\n')}`
-    .replace(/^\n+|\n+$/g, '')
-    .replace(/\n\n(?!\n)/g, '\n')
-    .replace(/\n{3,}/g, '\n\n');
+  useEffect(() => {
+    const formattedText = `${quiz.question
+      .replace(/<strong>/g, '')
+      .replace(/<\/strong>/g, '')
+      .replace(/<\/?p>/g, '\n')}\n${quiz.answers
+      .map((item) => {
+        const content = item.content
+          .replace(/<strong>/g, '')
+          .replace(/<\/strong>/g, '')
+          .replace(/<\/?p>/g, '\n');
+        return content;
+      })
+      .join('\n')}`
+      .replace(/^\n+|\n+$/g, '')
+      .replace(/\n\n(?!\n)/g, '\n')
+      .replace(/\n{3,}/g, '\n\n');
+
+    setOriginQuizTextarea(formattedText);
+  }, [quiz]);
 
   const quizTextarea = originQuizTextarea;
 
