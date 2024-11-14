@@ -34,7 +34,7 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
       inputQuiz.quizBundleId ?? ''
     );
 
-    if (updatedQuiz && updatedQuiz !== quiz) {
+    if (updatedQuiz) {
       setQuiz(updatedQuiz);
     }
   }, [inputQuiz]);
