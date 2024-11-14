@@ -107,11 +107,11 @@ const QuizPractice: React.FC<QuizDisplayProps> = ({
     let wrathPoint = 0;
 
     if (isGotHint) {
-      wrathPoint += 10;
+      wrathPoint += 15;
     }
 
     if (isAnswerCorrect) {
-      wrathPoint -= 5;
+      wrathPoint -= 10;
     } else {
       wrathPoint += 20;
     }
