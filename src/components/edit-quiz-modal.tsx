@@ -183,6 +183,7 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
         ...quiz,
         question,
         answers: answers,
+        correctAnswers: [],
       });
     }
   };
