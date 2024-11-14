@@ -57,7 +57,7 @@ const PracticePage = () => {
   }
 
   const handleNextQuiz = () => {
-    if (answered === quizCountNumber) {
+    if (answered >= quizCountNumber) {
       const currentHistory = JSON.parse(
         localStorage.getItem(`${quizBundleId}-history`) || '[]'
       );
