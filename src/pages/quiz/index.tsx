@@ -220,8 +220,8 @@ const QuizPage: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   const [numberOfQuestions, setNumberOfQuestions] = useState<number>(
-    Number(localStorage.getItem(`${quizBundleId}-count`)) > 50
-      ? 50
+    Number(localStorage.getItem(`${quizBundleId}-count`)) > 10
+      ? 10
       : Number(localStorage.getItem(`${quizBundleId}-count`))
   );
 
