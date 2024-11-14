@@ -77,7 +77,7 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
       .replace(/\n{3,}/g, '\n\n');
 
     setOriginQuizTextarea(formattedText);
-  }, [quiz]);
+  }, [quiz, inputQuiz]);
 
   const quizTextarea = originQuizTextarea;
 
