@@ -136,6 +136,7 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
     )!;
     setQuiz(originQuiz);
     onUpdate(originQuiz);
+    setInputValue(originQuizTextarea);
     // setIsModalVisible(false);
     onClose();
   };
