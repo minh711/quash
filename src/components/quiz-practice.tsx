@@ -70,11 +70,11 @@ const QuizPractice: React.FC<QuizDisplayProps> = ({
 
   const handleUpdateQuiz = (updatedQuiz: Quiz) => {
     // setSelectedAnswers([]);
-    // setIsCorrect(null);
-    // setIsResult(false);
+    setIsCorrect(true);
     setQuiz(updatedQuiz);
-    // setIsChecked(false);
-    // setIsGotHint(false);
+    setIsResult(true);
+    setIsChecked(true);
+    setIsGotHint(true);
     // setIsHint(false);
   };
 
