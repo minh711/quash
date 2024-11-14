@@ -75,6 +75,7 @@ const QuizPractice: React.FC<QuizDisplayProps> = ({
     setIsResult(true);
     setIsChecked(true);
     setIsGotHint(true);
+    onAnswerChecked(isCorrect ?? true);
     // setIsHint(false);
   };
 
