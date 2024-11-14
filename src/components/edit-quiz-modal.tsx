@@ -4,6 +4,7 @@ import { Quiz, Answer } from '../entities/quiz';
 import RichTextEditor from './rich-text-editor';
 import { v4 as uuidv4 } from 'uuid';
 import { DataSource } from '../scripts/data-source';
+import { format } from 'path';
 
 interface EditQuizModalProps {
   inputQuiz: Quiz;
@@ -37,9 +38,19 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
     if (updatedQuiz) {
       setQuiz(updatedQuiz);
     }
-  }, [inputQuiz]);
+  }, [inputQuiz, visible]);
 
   const [originQuizTextarea, setOriginQuizTextarea] = useState(() => {
+    const quizRepository = DataSource.getInstance().quizRepository;
+    const updatedQuiz = quizRepository.getById(
+      inputQuiz.id,
+      inputQuiz.quizBundleId ?? ''
+    );
+
+    if (updatedQuiz) {
+      setQuiz(updatedQuiz);
+    }
+
     const formattedText = `${quiz.question
       .replace(/<strong>/g, '')
       .replace(/<\/strong>/g, '')
@@ -77,7 +88,8 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
       .replace(/\n{3,}/g, '\n\n');
 
     setOriginQuizTextarea(formattedText);
-  }, [quiz, inputQuiz]);
+    setInputValue(formattedText);
+  }, [quiz, visible]);
 
   const quizTextarea = originQuizTextarea;
 
@@ -109,9 +121,6 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
         answers.push(answer);
       }
     });
-
-    console.log('Update', questionContent);
-    console.log('Update', answers);
 
     setQuiz({
       ...quiz,
