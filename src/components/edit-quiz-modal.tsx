@@ -122,11 +122,15 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
       }
     });
 
+    const filteredCorrectAnswers = quiz.correctAnswers.filter((answer) =>
+      answers.some((item) => item.id === answer)
+    );
+
     setQuiz({
       ...quiz,
       question: questionContent ?? '',
       answers: answers,
-      correctAnswers: quiz.correctAnswers,
+      correctAnswers: filteredCorrectAnswers,
     });
 
     setQuiz(quiz);
@@ -136,7 +140,7 @@ const EditQuizModal: React.FC<EditQuizModalProps> = ({
       ...quiz,
       question: questionContent ?? '',
       answers: answers,
-      correctAnswers: quiz.correctAnswers,
+      correctAnswers: filteredCorrectAnswers,
     });
 
     const originQuiz = quizRepository.getById(

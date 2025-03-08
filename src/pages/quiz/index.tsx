@@ -125,11 +125,15 @@ const QuizPage: React.FC = () => {
       return;
     }
 
+    const filteredSelectedAnswers = selectedAnswers.filter((answer) =>
+      answers.some((item) => item.id === answer)
+    );
+
     const newQuiz: Quiz = {
       id: uuidv4(),
       question: questionContent ?? '',
       answers: answers,
-      correctAnswers: selectedAnswers,
+      correctAnswers: filteredSelectedAnswers,
       answeredCount: 0,
       correctAnsweredCount: 0,
       incorrectAnsweredCount: 0,
